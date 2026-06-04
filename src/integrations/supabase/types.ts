@@ -14,7 +14,78 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      daily_sales: {
+        Row: {
+          created_at: string
+          faturado_loja: number
+          full_value: number
+          id: string
+          mercado_livre: number
+          sale_date: string
+          updated_at: string
+          user_id: string
+          venda_loja: number
+        }
+        Insert: {
+          created_at?: string
+          faturado_loja?: number
+          full_value?: number
+          id?: string
+          mercado_livre?: number
+          sale_date: string
+          updated_at?: string
+          user_id: string
+          venda_loja?: number
+        }
+        Update: {
+          created_at?: string
+          faturado_loja?: number
+          full_value?: number
+          id?: string
+          mercado_livre?: number
+          sale_date?: string
+          updated_at?: string
+          user_id?: string
+          venda_loja?: number
+        }
+        Relationships: []
+      }
+      monthly_goals: {
+        Row: {
+          created_at: string
+          dias_uteis: number
+          id: string
+          meta_loja: number
+          meta_mercado_livre: number
+          month: number
+          updated_at: string
+          user_id: string
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          dias_uteis?: number
+          id?: string
+          meta_loja?: number
+          meta_mercado_livre?: number
+          month: number
+          updated_at?: string
+          user_id: string
+          year: number
+        }
+        Update: {
+          created_at?: string
+          dias_uteis?: number
+          id?: string
+          meta_loja?: number
+          meta_mercado_livre?: number
+          month?: number
+          updated_at?: string
+          user_id?: string
+          year?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
