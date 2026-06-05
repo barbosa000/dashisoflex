@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet, redirect, Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, PlusSquare, History, Target, LogOut, TrendingUp, Menu } from "lucide-react";
+import { LayoutDashboard, PlusSquare, History, Target, LogOut, TrendingUp, Menu, FileText } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -20,6 +20,7 @@ const nav = [
   { to: "/lancamento", label: "Lançamento", icon: PlusSquare },
   { to: "/historico", label: "Histórico", icon: History },
   { to: "/metas", label: "Metas", icon: Target },
+  { to: "/relatorio", label: "Relatório", icon: FileText },
 ] as const;
 
 function Layout() {

@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRelatorioRouteImport } from './routes/_authenticated/relatorio'
 import { Route as AuthenticatedMetasRouteImport } from './routes/_authenticated/metas'
 import { Route as AuthenticatedLancamentoRouteImport } from './routes/_authenticated/lancamento'
 import { Route as AuthenticatedHistoricoRouteImport } from './routes/_authenticated/historico'
@@ -30,6 +31,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRelatorioRoute = AuthenticatedRelatorioRouteImport.update({
+  id: '/relatorio',
+  path: '/relatorio',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedMetasRoute = AuthenticatedMetasRouteImport.update({
   id: '/metas',
@@ -59,6 +65,7 @@ export interface FileRoutesByFullPath {
   '/historico': typeof AuthenticatedHistoricoRoute
   '/lancamento': typeof AuthenticatedLancamentoRoute
   '/metas': typeof AuthenticatedMetasRoute
+  '/relatorio': typeof AuthenticatedRelatorioRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -67,6 +74,7 @@ export interface FileRoutesByTo {
   '/historico': typeof AuthenticatedHistoricoRoute
   '/lancamento': typeof AuthenticatedLancamentoRoute
   '/metas': typeof AuthenticatedMetasRoute
+  '/relatorio': typeof AuthenticatedRelatorioRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -77,6 +85,7 @@ export interface FileRoutesById {
   '/_authenticated/historico': typeof AuthenticatedHistoricoRoute
   '/_authenticated/lancamento': typeof AuthenticatedLancamentoRoute
   '/_authenticated/metas': typeof AuthenticatedMetasRoute
+  '/_authenticated/relatorio': typeof AuthenticatedRelatorioRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -87,8 +96,16 @@ export interface FileRouteTypes {
     | '/historico'
     | '/lancamento'
     | '/metas'
+    | '/relatorio'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/dashboard' | '/historico' | '/lancamento' | '/metas'
+  to:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/historico'
+    | '/lancamento'
+    | '/metas'
+    | '/relatorio'
   id:
     | '__root__'
     | '/'
@@ -98,6 +115,7 @@ export interface FileRouteTypes {
     | '/_authenticated/historico'
     | '/_authenticated/lancamento'
     | '/_authenticated/metas'
+    | '/_authenticated/relatorio'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -128,6 +146,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/relatorio': {
+      id: '/_authenticated/relatorio'
+      path: '/relatorio'
+      fullPath: '/relatorio'
+      preLoaderRoute: typeof AuthenticatedRelatorioRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/metas': {
       id: '/_authenticated/metas'
@@ -165,6 +190,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedHistoricoRoute: typeof AuthenticatedHistoricoRoute
   AuthenticatedLancamentoRoute: typeof AuthenticatedLancamentoRoute
   AuthenticatedMetasRoute: typeof AuthenticatedMetasRoute
+  AuthenticatedRelatorioRoute: typeof AuthenticatedRelatorioRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -172,6 +198,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedHistoricoRoute: AuthenticatedHistoricoRoute,
   AuthenticatedLancamentoRoute: AuthenticatedLancamentoRoute,
   AuthenticatedMetasRoute: AuthenticatedMetasRoute,
+  AuthenticatedRelatorioRoute: AuthenticatedRelatorioRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
