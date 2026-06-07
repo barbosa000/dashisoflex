@@ -156,14 +156,14 @@ function DashboardPage() {
       </div>
 
       {/* Detalhamento do dia */}
-      <Card>
+      <Card className="custom-shadow border-slate-100/80">
         <CardHeader>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <CardTitle className="flex items-center gap-2"><Calendar className="h-4 w-4" /> Detalhamento do dia</CardTitle>
-              <CardDescription>Veja o resultado de qualquer dia do mês.</CardDescription>
+              <CardTitle className="flex items-center gap-2 text-base font-semibold text-foreground"><Calendar className="h-4.5 w-4.5 text-primary" /> Detalhamento do dia</CardTitle>
+              <CardDescription className="text-xs text-muted-foreground/80">Veja o resultado de qualquer dia do mês.</CardDescription>
             </div>
-            <Input type="date" value={selectedDay} onChange={(e) => setSelectedDay(e.target.value)} className="max-w-[180px]" />
+            <Input type="date" value={selectedDay} onChange={(e) => setSelectedDay(e.target.value)} className="max-w-[180px] bg-white text-sm" />
           </div>
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-3">
@@ -175,48 +175,48 @@ function DashboardPage() {
             title="Mercado Livre (dias totais)"
             realizado={diaML} meta={metaDiaML} pct={pctDiaML}
           />
-          <div className="rounded-lg border bg-gradient-to-br from-primary/5 to-primary/10 p-4">
-            <div className="text-xs text-muted-foreground">Total do dia (Loja Virtual + ML + Full)</div>
-            <div className="mt-1 text-2xl font-bold text-primary">{fmtBRL(diaTotal)}</div>
-            <div className="mt-2 text-xs text-muted-foreground">Full: {fmtBRL(diaFull)}</div>
-            {!dia && <div className="mt-2 text-xs text-muted-foreground">Sem lançamento para este dia.</div>}
+          <div className="rounded-xl border border-primary/10 bg-gradient-to-br from-primary/5 to-primary/10 p-4 transition-all duration-200 hover:shadow-md">
+            <div className="text-xs font-semibold text-primary/80">Total do dia (Loja Virtual + ML + Full)</div>
+            <div className="mt-1.5 text-2xl font-black text-primary">{fmtBRL(diaTotal)}</div>
+            <div className="mt-2 text-xs font-medium text-muted-foreground">Full: {fmtBRL(diaFull)}</div>
+            {!dia && <div className="mt-2 text-xs font-semibold text-amber-600">Sem lançamento para este dia.</div>}
           </div>
         </CardContent>
       </Card>
 
       {/* Gráficos */}
       <div className="grid gap-4 lg:grid-cols-2">
-        <Card>
+        <Card className="custom-shadow border-slate-100/80">
           <CardHeader>
-            <CardTitle>Faturamento diário</CardTitle>
-            <CardDescription>Total por dia (Loja Virtual + ML + Full)</CardDescription>
+            <CardTitle className="text-base font-semibold text-foreground">Faturamento diário</CardTitle>
+            <CardDescription className="text-xs text-muted-foreground/80">Total por dia (Loja Virtual + ML + Full)</CardDescription>
           </CardHeader>
           <CardContent className="h-72">
             <ResponsiveContainer>
               <BarChart data={acumulado}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                <XAxis dataKey="date" fontSize={11} />
-                <YAxis fontSize={11} tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`} />
-                <Tooltip formatter={(v: number) => fmtBRL(v)} />
-                <Bar dataKey="diario" name="Total dia" fill="var(--color-chart-1)" radius={[6, 6, 0, 0]} />
+                <CartesianGrid strokeDasharray="3 3" className="stroke-slate-100" />
+                <XAxis dataKey="date" fontSize={11} stroke="#64748b" />
+                <YAxis fontSize={11} stroke="#64748b" tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`} />
+                <Tooltip formatter={(v: number) => fmtBRL(v)} contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0' }} />
+                <Bar dataKey="diario" name="Total dia" fill="var(--color-chart-1)" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="custom-shadow border-slate-100/80">
           <CardHeader>
-            <CardTitle>Evolução acumulada vs meta</CardTitle>
-            <CardDescription>Acumulado no mês comparado à meta total</CardDescription>
+            <CardTitle className="text-base font-semibold text-foreground">Evolução acumulada vs meta</CardTitle>
+            <CardDescription className="text-xs text-muted-foreground/80">Acumulado no mês comparado à meta total</CardDescription>
           </CardHeader>
           <CardContent className="h-72">
             <ResponsiveContainer>
               <LineChart data={acumulado.map((a) => ({ ...a, meta: metaTotal }))}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                <XAxis dataKey="date" fontSize={11} />
-                <YAxis fontSize={11} tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`} />
-                <Tooltip formatter={(v: number) => fmtBRL(v)} />
-                <Legend />
+                <CartesianGrid strokeDasharray="3 3" className="stroke-slate-100" />
+                <XAxis dataKey="date" fontSize={11} stroke="#64748b" />
+                <YAxis fontSize={11} stroke="#64748b" tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`} />
+                <Tooltip formatter={(v: number) => fmtBRL(v)} contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0' }} />
+                <Legend iconType="circle" wrapperStyle={{ fontSize: '12px' }} />
                 <Line type="monotone" dataKey="acumTotal" name="Realizado" stroke="var(--color-chart-1)" strokeWidth={3} dot={false} />
                 <Line type="monotone" dataKey="meta" name="Meta" stroke="var(--color-chart-4)" strokeWidth={2} strokeDasharray="5 5" dot={false} />
               </LineChart>
@@ -241,15 +241,15 @@ function KpiCard({
     tone === "destructive" ? "bg-destructive/10 text-destructive" :
     "bg-primary/10 text-primary";
   return (
-    <Card>
+    <Card className="card-hover-effect custom-shadow border-slate-100/80">
       <CardContent className="pt-6">
         <div className="flex items-start justify-between">
           <div>
-            <div className="text-xs uppercase tracking-wide text-muted-foreground">{title}</div>
-            <div className="mt-1 text-2xl font-bold">{value}</div>
-            {subtitle && <div className="mt-1 text-xs text-muted-foreground">{subtitle}</div>}
+            <div className="text-xs uppercase tracking-wide font-semibold text-muted-foreground">{title}</div>
+            <div className="mt-1.5 text-2xl font-bold tracking-tight text-foreground">{value}</div>
+            {subtitle && <div className="mt-1 text-xs text-muted-foreground/80">{subtitle}</div>}
           </div>
-          <div className={cn("flex h-10 w-10 items-center justify-center rounded-lg", toneClasses)}>
+          <div className={cn("flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-300", toneClasses)}>
             <Icon className="h-5 w-5" />
           </div>
         </div>
@@ -269,29 +269,29 @@ function ChannelProgress({
     tone === "success" ? "bg-success" :
     tone === "warning" ? "bg-warning" : "bg-destructive";
   return (
-    <Card>
+    <Card className="card-hover-effect custom-shadow border-slate-100/80">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Icon className="h-4 w-4" /> {title}
+          <CardTitle className="flex items-center gap-2 text-base font-semibold text-foreground">
+            <Icon className="h-4.5 w-4.5 text-primary" /> {title}
           </CardTitle>
           <StatusBadge pct={pct} />
         </div>
-        <CardDescription>{subtitle}</CardDescription>
+        <CardDescription className="text-xs text-muted-foreground/80">{subtitle}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
         <div className="flex justify-between text-sm">
           <span className="text-muted-foreground">Realizado</span>
-          <span className="font-semibold">{fmtBRL(realizado)}</span>
+          <span className="font-semibold text-foreground">{fmtBRL(realizado)}</span>
         </div>
         <div className="flex justify-between text-sm">
           <span className="text-muted-foreground">Meta</span>
-          <span className="font-semibold">{fmtBRL(meta)}</span>
+          <span className="font-semibold text-foreground">{fmtBRL(meta)}</span>
         </div>
-        <div className="h-3 w-full overflow-hidden rounded-full bg-muted">
-          <div className={cn("h-full transition-all", barColor)} style={{ width: `${Math.min(pct, 100)}%` }} />
+        <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
+          <div className={cn("h-full transition-all duration-500 rounded-full", barColor)} style={{ width: `${Math.min(pct, 100)}%` }} />
         </div>
-        <div className="text-right text-sm font-semibold">{fmtPct(pct)}</div>
+        <div className="text-right text-sm font-bold text-foreground">{fmtPct(pct)}</div>
       </CardContent>
     </Card>
   );
@@ -302,12 +302,12 @@ function DayMetric({
 }: { title: string; realizado: number; meta: number; pct: number }) {
   const tone = statusColor(pct);
   return (
-    <div className="rounded-lg border p-4">
+    <div className="rounded-xl border border-slate-100/80 bg-white p-4 custom-shadow card-hover-effect">
       <div className="flex items-center justify-between">
-        <div className="text-xs text-muted-foreground">{title}</div>
+        <div className="text-xs font-medium text-muted-foreground">{title}</div>
         <StatusBadge pct={pct} />
       </div>
-      <div className="mt-2 text-xl font-bold">{fmtBRL(realizado)}</div>
+      <div className="mt-2 text-xl font-bold text-foreground">{fmtBRL(realizado)}</div>
       <div className="text-xs text-muted-foreground">Meta: {fmtBRL(meta)}</div>
       <div className={cn(
         "mt-1 text-xs font-semibold",
@@ -319,7 +319,8 @@ function DayMetric({
 
 function StatusBadge({ pct }: { pct: number }) {
   const tone = statusColor(pct);
-  if (tone === "success") return <Badge className="bg-success text-success-foreground hover:bg-success">Atingiu</Badge>;
-  if (tone === "warning") return <Badge className="bg-warning text-warning-foreground hover:bg-warning">Atenção</Badge>;
-  return <Badge variant="destructive">Abaixo</Badge>;
+  if (tone === "success") return <Badge className="bg-success text-success-foreground hover:bg-success border-none shadow-none font-medium px-2 py-0.5 text-xs">Atingiu</Badge>;
+  if (tone === "warning") return <Badge className="bg-warning text-warning-foreground hover:bg-warning border-none shadow-none font-medium px-2 py-0.5 text-xs">Atenção</Badge>;
+  return <Badge variant="destructive" className="border-none shadow-none font-medium px-2 py-0.5 text-xs">Abaixo</Badge>;
 }
+
