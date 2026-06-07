@@ -6,11 +6,16 @@
 *.jpg binary
 *.jpeg binary
 *.gif binary
-*.svg binary
 *.ico binary
 *.woff binary
 *.woff2 binary
 *.ttf binary
 *.eot binary
 *.otf binary
-*.lock binary
+
+# bun.lock and package-lock.json are text files — keep LF
+bun.lock text eol=lf
+package-lock.json text eol=lf
+
+# SVG as text so line endings are normalized
+*.svg text eol=lf
