@@ -4,8 +4,21 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { fmtBRL, totalDia, monthKey, parseISODate } from "@/lib/calc";
 import { toast } from "sonner";
 import { History, Pencil, Trash2 } from "lucide-react";
@@ -14,7 +27,20 @@ export const Route = createFileRoute("/_authenticated/historico")({
   component: HistoricoPage,
 });
 
-const MONTHS = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+const MONTHS = [
+  "Janeiro",
+  "Fevereiro",
+  "Março",
+  "Abril",
+  "Maio",
+  "Junho",
+  "Julho",
+  "Agosto",
+  "Setembro",
+  "Outubro",
+  "Novembro",
+  "Dezembro",
+];
 
 function HistoricoPage() {
   const qc = useQueryClient();
@@ -31,7 +57,8 @@ function HistoricoPage() {
       const { data, error } = await supabase
         .from("daily_sales")
         .select("*")
-        .gte("sale_date", start).lte("sale_date", end)
+        .gte("sale_date", start)
+        .lte("sale_date", end)
         .order("sale_date", { ascending: false });
       if (error) throw error;
       return data ?? [];
@@ -81,17 +108,29 @@ function HistoricoPage() {
         </CardHeader>
         <CardContent className="flex flex-wrap gap-3">
           <Select value={String(month)} onValueChange={(v) => setMonth(Number(v))}>
-            <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="w-40">
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
-              {MONTHS.map((m, i) => (<SelectItem key={i} value={String(i + 1)}>{m}</SelectItem>))}
+              {MONTHS.map((m, i) => (
+                <SelectItem key={i} value={String(i + 1)}>
+                  {m}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           <Select value={String(year)} onValueChange={(v) => setYear(Number(v))}>
-            <SelectTrigger className="w-28"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="w-28">
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               {Array.from({ length: 5 }).map((_, i) => {
                 const y = cur.year - 2 + i;
-                return <SelectItem key={y} value={String(y)}>{y}</SelectItem>;
+                return (
+                  <SelectItem key={y} value={String(y)}>
+                    {y}
+                  </SelectItem>
+                );
               })}
             </SelectContent>
           </Select>
@@ -100,15 +139,21 @@ function HistoricoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Lançamentos de {MONTHS[month - 1]} / {year}</CardTitle>
-          <CardDescription>{sales.length} {sales.length === 1 ? "registro" : "registros"}</CardDescription>
+          <CardTitle>
+            Lançamentos de {MONTHS[month - 1]} / {year}
+          </CardTitle>
+          <CardDescription>
+            {sales.length} {sales.length === 1 ? "registro" : "registros"}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           {sales.length === 0 ? (
             <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
               Nenhum lançamento neste período.
               <div className="mt-3">
-                <Link to="/lancamento"><Button size="sm">Criar primeiro lançamento</Button></Link>
+                <Link to="/lancamento">
+                  <Button size="sm">Criar primeiro lançamento</Button>
+                </Link>
               </div>
             </div>
           ) : (
@@ -128,19 +173,37 @@ function HistoricoPage() {
                 <TableBody>
                   {sales.map((s) => (
                     <TableRow key={s.id}>
-                      <TableCell className="font-medium">{parseISODate(s.sale_date).toLocaleDateString("pt-BR")}</TableCell>
-                      <TableCell className="text-right text-muted-foreground">{fmtBRL(Number(s.venda_loja))}</TableCell>
-                      <TableCell className="text-right">{fmtBRL(Number(s.faturado_loja))}</TableCell>
-                      <TableCell className="text-right">{fmtBRL(Number(s.mercado_livre))}</TableCell>
+                      <TableCell className="font-medium">
+                        {parseISODate(s.sale_date).toLocaleDateString("pt-BR")}
+                      </TableCell>
+                      <TableCell className="text-right text-muted-foreground">
+                        {fmtBRL(Number(s.venda_loja))}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {fmtBRL(Number(s.faturado_loja))}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {fmtBRL(Number(s.mercado_livre))}
+                      </TableCell>
                       <TableCell className="text-right">{fmtBRL(Number(s.full_value))}</TableCell>
-                      <TableCell className="text-right font-semibold">{fmtBRL(totalDia(s))}</TableCell>
+                      <TableCell className="text-right font-semibold">
+                        {fmtBRL(totalDia(s))}
+                      </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
                           <Link to="/lancamento" search={{ d: s.sale_date } as never}>
-                            <Button size="icon" variant="ghost" title="Editar"><Pencil className="h-4 w-4" /></Button>
+                            <Button size="icon" variant="ghost" title="Editar">
+                              <Pencil className="h-4 w-4" />
+                            </Button>
                           </Link>
-                          <Button size="icon" variant="ghost" title="Excluir"
-                            onClick={() => { if (confirm("Excluir este lançamento?")) del.mutate(s.id); }}>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            title="Excluir"
+                            onClick={() => {
+                              if (confirm("Excluir este lançamento?")) del.mutate(s.id);
+                            }}
+                          >
                             <Trash2 className="h-4 w-4 text-destructive" />
                           </Button>
                         </div>
@@ -149,7 +212,9 @@ function HistoricoPage() {
                   ))}
                   <TableRow className="bg-muted/50 font-semibold">
                     <TableCell>Totais</TableCell>
-                    <TableCell className="text-right text-muted-foreground">{fmtBRL(totals.vendaLoja)}</TableCell>
+                    <TableCell className="text-right text-muted-foreground">
+                      {fmtBRL(totals.vendaLoja)}
+                    </TableCell>
                     <TableCell className="text-right">{fmtBRL(totals.faturadoLoja)}</TableCell>
                     <TableCell className="text-right">{fmtBRL(totals.ml)}</TableCell>
                     <TableCell className="text-right">{fmtBRL(totals.full)}</TableCell>

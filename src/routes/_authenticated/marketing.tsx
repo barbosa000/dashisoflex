@@ -17,7 +17,8 @@ function makePlaceholder(title: string, description: string) {
             </div>
             <p className="text-base font-semibold">Módulo em construção</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Este módulo já está listado no menu e protegido por permissões.<br />
+              Este módulo já está listado no menu e protegido por permissões.
+              <br />
               Solicite a implementação do conteúdo quando desejar.
             </p>
           </CardContent>

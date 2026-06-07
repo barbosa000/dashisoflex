@@ -26,8 +26,7 @@ export const fmtPct = (n: number) =>
 export const totalDia = (s: Pick<DailySale, "faturado_loja" | "mercado_livre" | "full_value">) =>
   Number(s.faturado_loja || 0) + Number(s.mercado_livre || 0) + Number(s.full_value || 0);
 
-export const daysInMonth = (year: number, month: number) =>
-  new Date(year, month, 0).getDate(); // month 1-12
+export const daysInMonth = (year: number, month: number) => new Date(year, month, 0).getDate(); // month 1-12
 
 export function statusColor(pct: number): "success" | "warning" | "destructive" {
   if (pct >= 100) return "success";

@@ -81,7 +81,9 @@ function LancamentoPage() {
         </div>
         <div>
           <h1 className="text-2xl font-bold">Lançamento Diário</h1>
-          <p className="text-sm text-muted-foreground">Insira ou atualize os valores faturados do dia.</p>
+          <p className="text-sm text-muted-foreground">
+            Insira ou atualize os valores faturados do dia.
+          </p>
         </div>
       </div>
 
@@ -91,9 +93,16 @@ function LancamentoPage() {
           <CardDescription>Escolha a data para lançar ou editar.</CardDescription>
         </CardHeader>
         <CardContent>
-          <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="max-w-xs" />
+          <Input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="max-w-xs"
+          />
           {existing && (
-            <p className="mt-2 text-xs text-muted-foreground">Já existe lançamento para esta data — os valores serão atualizados.</p>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Já existe lançamento para esta data — os valores serão atualizados.
+            </p>
           )}
         </CardContent>
       </Card>
@@ -106,12 +115,24 @@ function LancamentoPage() {
         <CardContent className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label>Venda Loja Física</Label>
-            <Input type="number" step="0.01" value={vendaLoja} onChange={(e) => setVendaLoja(e.target.value)} />
-            <p className="text-xs text-muted-foreground">Informativo — não entra no total do dia.</p>
+            <Input
+              type="number"
+              step="0.01"
+              value={vendaLoja}
+              onChange={(e) => setVendaLoja(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">
+              Informativo — não entra no total do dia.
+            </p>
           </div>
           <div className="space-y-2">
             <Label>Faturado Loja Virtual</Label>
-            <Input type="number" step="0.01" value={faturadoLoja} onChange={(e) => setFaturadoLoja(e.target.value)} />
+            <Input
+              type="number"
+              step="0.01"
+              value={faturadoLoja}
+              onChange={(e) => setFaturadoLoja(e.target.value)}
+            />
           </div>
           <div className="space-y-2">
             <Label>Mercado Livre</Label>
@@ -119,17 +140,32 @@ function LancamentoPage() {
           </div>
           <div className="space-y-2">
             <Label>Full</Label>
-            <Input type="number" step="0.01" value={full} onChange={(e) => setFull(e.target.value)} />
+            <Input
+              type="number"
+              step="0.01"
+              value={full}
+              onChange={(e) => setFull(e.target.value)}
+            />
           </div>
 
           <div className="sm:col-span-2 rounded-lg border bg-gradient-to-br from-primary/5 to-primary/10 p-4">
-            <div className="text-xs text-muted-foreground">Total faturado do dia (Loja Virtual + ML + Full)</div>
+            <div className="text-xs text-muted-foreground">
+              Total faturado do dia (Loja Virtual + ML + Full)
+            </div>
             <div className="text-3xl font-bold text-primary">{fmtBRL(total)}</div>
           </div>
 
           <div className="sm:col-span-2">
-            <Button onClick={() => save.mutate()} disabled={save.isPending} className="w-full sm:w-auto">
-              {save.isPending ? "Salvando..." : existing ? "Atualizar lançamento" : "Salvar lançamento"}
+            <Button
+              onClick={() => save.mutate()}
+              disabled={save.isPending}
+              className="w-full sm:w-auto"
+            >
+              {save.isPending
+                ? "Salvando..."
+                : existing
+                  ? "Atualizar lançamento"
+                  : "Salvar lançamento"}
             </Button>
           </div>
         </CardContent>

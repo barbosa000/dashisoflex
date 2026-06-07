@@ -3,9 +3,18 @@ import { useServerFn } from "@tanstack/react-start";
 import { getMe } from "@/lib/users.functions";
 
 export type AppModule =
-  | "dashboard" | "lancamento" | "historico" | "metas" | "relatorio"
-  | "marketing" | "comercial" | "financeiro" | "rh" | "producao"
-  | "configuracoes" | "usuarios";
+  | "dashboard"
+  | "lancamento"
+  | "historico"
+  | "metas"
+  | "relatorio"
+  | "marketing"
+  | "comercial"
+  | "financeiro"
+  | "rh"
+  | "producao"
+  | "configuracoes"
+  | "usuarios";
 
 export function useMe() {
   const fetchMe = useServerFn(getMe);

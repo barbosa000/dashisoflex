@@ -6,7 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { fmtBRL, daysInMonth, monthKey } from "@/lib/calc";
 import { Target } from "lucide-react";
@@ -15,7 +21,20 @@ export const Route = createFileRoute("/_authenticated/metas")({
   component: MetasPage,
 });
 
-const MONTHS = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+const MONTHS = [
+  "Janeiro",
+  "Fevereiro",
+  "Março",
+  "Abril",
+  "Maio",
+  "Junho",
+  "Julho",
+  "Agosto",
+  "Setembro",
+  "Outubro",
+  "Novembro",
+  "Dezembro",
+];
 
 function MetasPage() {
   const qc = useQueryClient();
@@ -33,7 +52,9 @@ function MetasPage() {
       const { data, error } = await supabase
         .from("monthly_goals")
         .select("*")
-        .eq("year", year).eq("month", month).maybeSingle();
+        .eq("year", year)
+        .eq("month", month)
+        .maybeSingle();
       if (error) throw error;
       return data;
     },
@@ -51,7 +72,8 @@ function MetasPage() {
       if (!u.user) throw new Error("Sem sessão");
       const payload = {
         user_id: u.user.id,
-        year, month,
+        year,
+        month,
         meta_loja: Number(metaLoja) || 0,
         meta_mercado_livre: Number(metaML) || 0,
         dias_uteis: Number(diasUteis) || 22,
@@ -85,7 +107,9 @@ function MetasPage() {
         </div>
         <div>
           <h1 className="text-2xl font-bold">Configuração de Metas</h1>
-          <p className="text-sm text-muted-foreground">Defina a meta mensal de cada canal e os dias úteis do mês.</p>
+          <p className="text-sm text-muted-foreground">
+            Defina a meta mensal de cada canal e os dias úteis do mês.
+          </p>
         </div>
       </div>
 
@@ -98,10 +122,14 @@ function MetasPage() {
           <div className="space-y-2">
             <Label>Mês</Label>
             <Select value={String(month)} onValueChange={(v) => setMonth(Number(v))}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 {MONTHS.map((m, i) => (
-                  <SelectItem key={i} value={String(i + 1)}>{m}</SelectItem>
+                  <SelectItem key={i} value={String(i + 1)}>
+                    {m}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -117,23 +145,44 @@ function MetasPage() {
         <CardHeader>
           <CardTitle>Metas do mês</CardTitle>
           <CardDescription>
-            Loja Virtual usa <b>dias úteis</b> · Mercado Livre usa <b>dias totais</b> ({totalDiasMes} dias)
+            Loja Virtual usa <b>dias úteis</b> · Mercado Livre usa <b>dias totais</b> (
+            {totalDiasMes} dias)
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-3">
           <div className="space-y-2">
             <Label>Meta Loja Virtual (R$)</Label>
-            <Input type="number" step="0.01" value={metaLoja} onChange={(e) => setMetaLoja(e.target.value)} />
-            <p className="text-xs text-muted-foreground">Diária: <b>{fmtBRL(metaDiaLoja)}</b></p>
+            <Input
+              type="number"
+              step="0.01"
+              value={metaLoja}
+              onChange={(e) => setMetaLoja(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">
+              Diária: <b>{fmtBRL(metaDiaLoja)}</b>
+            </p>
           </div>
           <div className="space-y-2">
             <Label>Meta Mercado Livre (R$)</Label>
-            <Input type="number" step="0.01" value={metaML} onChange={(e) => setMetaML(e.target.value)} />
-            <p className="text-xs text-muted-foreground">Diária: <b>{fmtBRL(metaDiaML)}</b></p>
+            <Input
+              type="number"
+              step="0.01"
+              value={metaML}
+              onChange={(e) => setMetaML(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">
+              Diária: <b>{fmtBRL(metaDiaML)}</b>
+            </p>
           </div>
           <div className="space-y-2">
             <Label>Dias úteis do mês</Label>
-            <Input type="number" min="1" max="31" value={diasUteis} onChange={(e) => setDiasUteis(e.target.value)} />
+            <Input
+              type="number"
+              min="1"
+              max="31"
+              value={diasUteis}
+              onChange={(e) => setDiasUteis(e.target.value)}
+            />
             <p className="text-xs text-muted-foreground">Aplicado à meta da Loja Virtual</p>
           </div>
           <div className="sm:col-span-3 rounded-lg border bg-muted/40 p-4">

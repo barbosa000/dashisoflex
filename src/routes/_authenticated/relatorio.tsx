@@ -4,10 +4,35 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
-  AreaChart, Area, BarChart, Bar, Line, ComposedChart, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  Line,
+  ComposedChart,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+  Legend,
 } from "recharts";
 import { fmtBRL, monthKey, totalDia, parseISODate } from "@/lib/calc";
 import { FileText, Mail, Download, Trophy } from "lucide-react";
@@ -17,7 +42,20 @@ export const Route = createFileRoute("/_authenticated/relatorio")({
   component: RelatorioPage,
 });
 
-const MONTHS = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+const MONTHS = [
+  "Janeiro",
+  "Fevereiro",
+  "Março",
+  "Abril",
+  "Maio",
+  "Junho",
+  "Julho",
+  "Agosto",
+  "Setembro",
+  "Outubro",
+  "Novembro",
+  "Dezembro",
+];
 
 function RelatorioPage() {
   const cur = monthKey(new Date());
@@ -32,8 +70,10 @@ function RelatorioPage() {
       const endD = new Date(year, month, 0);
       const end = `${year}-${String(month).padStart(2, "0")}-${String(endD.getDate()).padStart(2, "0")}`;
       const { data, error } = await supabase
-        .from("daily_sales").select("*")
-        .gte("sale_date", start).lte("sale_date", end)
+        .from("daily_sales")
+        .select("*")
+        .gte("sale_date", start)
+        .lte("sale_date", end)
         .order("sale_date", { ascending: true });
       if (error) throw error;
       return data ?? [];
@@ -99,12 +139,18 @@ function RelatorioPage() {
           </div>
           <div>
             <h1 className="text-2xl font-bold">Relatório Geral</h1>
-            <p className="text-sm text-muted-foreground">Emissão de relatório e histórico com gráficos.</p>
+            <p className="text-sm text-muted-foreground">
+              Emissão de relatório e histórico com gráficos.
+            </p>
           </div>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleEmail}><Mail className="h-4 w-4" /> Enviar por E-mail</Button>
-          <Button onClick={handlePrint}><Download className="h-4 w-4" /> Exportar PDF</Button>
+          <Button variant="outline" onClick={handleEmail}>
+            <Mail className="h-4 w-4" /> Enviar por E-mail
+          </Button>
+          <Button onClick={handlePrint}>
+            <Download className="h-4 w-4" /> Exportar PDF
+          </Button>
         </div>
       </div>
 
@@ -116,17 +162,29 @@ function RelatorioPage() {
           </CardHeader>
           <CardContent className="flex flex-wrap gap-3">
             <Select value={String(month)} onValueChange={(v) => setMonth(Number(v))}>
-              <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="w-40">
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
-                {MONTHS.map((m, i) => (<SelectItem key={i} value={String(i + 1)}>{m}</SelectItem>))}
+                {MONTHS.map((m, i) => (
+                  <SelectItem key={i} value={String(i + 1)}>
+                    {m}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             <Select value={String(year)} onValueChange={(v) => setYear(Number(v))}>
-              <SelectTrigger className="w-28"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="w-28">
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 {Array.from({ length: 5 }).map((_, i) => {
                   const y = cur.year - 2 + i;
-                  return <SelectItem key={y} value={String(y)}>{y}</SelectItem>;
+                  return (
+                    <SelectItem key={y} value={String(y)}>
+                      {y}
+                    </SelectItem>
+                  );
                 })}
               </SelectContent>
             </Select>
@@ -140,8 +198,16 @@ function RelatorioPage() {
               <CardTitle className="text-3xl">{fmtBRL(stats.totals.total)}</CardTitle>
             </CardHeader>
             <CardContent className="text-xs text-muted-foreground space-y-1">
-              <div>Loja Virtual: <span className="text-foreground font-medium">{fmtBRL(stats.totals.loja)}</span></div>
-              <div>Mercado Livre + Full: <span className="text-foreground font-medium">{fmtBRL(stats.totals.ml + stats.totals.full)}</span></div>
+              <div>
+                Loja Virtual:{" "}
+                <span className="text-foreground font-medium">{fmtBRL(stats.totals.loja)}</span>
+              </div>
+              <div>
+                Mercado Livre + Full:{" "}
+                <span className="text-foreground font-medium">
+                  {fmtBRL(stats.totals.ml + stats.totals.full)}
+                </span>
+              </div>
             </CardContent>
           </Card>
           <Card>
@@ -153,7 +219,10 @@ function RelatorioPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="text-xs text-muted-foreground">
-              <div>Faturamento: <span className="text-foreground font-medium">{fmtBRL(stats.peak.value)}</span></div>
+              <div>
+                Faturamento:{" "}
+                <span className="text-foreground font-medium">{fmtBRL(stats.peak.value)}</span>
+              </div>
               <div>Maior resultado diário no período</div>
             </CardContent>
           </Card>
@@ -185,9 +254,15 @@ function RelatorioPage() {
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
                   <XAxis dataKey="day" />
-                  <YAxis tickFormatter={(v) => `R$${(v/1000).toFixed(0)}k`} />
+                  <YAxis tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`} />
                   <Tooltip formatter={(v: number) => fmtBRL(v)} />
-                  <Area type="monotone" dataKey="acumulado" stroke="hsl(var(--primary))" fill="url(#gAcc)" strokeWidth={2} />
+                  <Area
+                    type="monotone"
+                    dataKey="acumulado"
+                    stroke="hsl(var(--primary))"
+                    fill="url(#gAcc)"
+                    strokeWidth={2}
+                  />
                 </AreaChart>
               </ResponsiveContainer>
             </CardContent>
@@ -203,13 +278,20 @@ function RelatorioPage() {
                 <ComposedChart data={stats.daily}>
                   <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
                   <XAxis dataKey="day" />
-                  <YAxis tickFormatter={(v) => `R$${(v/1000).toFixed(0)}k`} />
+                  <YAxis tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`} />
                   <Tooltip formatter={(v: number) => fmtBRL(v)} />
                   <Legend />
                   <Bar dataKey="loja" name="Loja Virtual" stackId="a" fill="#10b981" />
                   <Bar dataKey="ml" name="Mercado Livre" stackId="a" fill="#f59e0b" />
                   <Bar dataKey="full" name="Full" stackId="a" fill="#3b82f6" />
-                  <Line type="monotone" dataKey="total" name="Total Diário" stroke="#ef4444" strokeWidth={2} dot={{ r: 4 }} />
+                  <Line
+                    type="monotone"
+                    dataKey="total"
+                    name="Total Diário"
+                    stroke="#ef4444"
+                    strokeWidth={2}
+                    dot={{ r: 4 }}
+                  />
                 </ComposedChart>
               </ResponsiveContainer>
             </CardContent>
@@ -240,7 +322,9 @@ function RelatorioPage() {
                 <TableBody>
                   {[...stats.daily].reverse().map((d) => (
                     <TableRow key={d.date}>
-                      <TableCell className="font-medium">{parseISODate(d.date).toLocaleDateString("pt-BR")}</TableCell>
+                      <TableCell className="font-medium">
+                        {parseISODate(d.date).toLocaleDateString("pt-BR")}
+                      </TableCell>
                       <TableCell className="text-right">{fmtBRL(d.loja)}</TableCell>
                       <TableCell className="text-right">{fmtBRL(d.ml)}</TableCell>
                       <TableCell className="text-right">{fmtBRL(d.full)}</TableCell>
@@ -251,10 +335,18 @@ function RelatorioPage() {
                 <TableFooter>
                   <TableRow>
                     <TableCell className="font-bold">Total Geral</TableCell>
-                    <TableCell className="text-right font-bold">{fmtBRL(stats.totals.loja)}</TableCell>
-                    <TableCell className="text-right font-bold">{fmtBRL(stats.totals.ml)}</TableCell>
-                    <TableCell className="text-right font-bold">{fmtBRL(stats.totals.full)}</TableCell>
-                    <TableCell className="text-right font-bold">{fmtBRL(stats.totals.total)}</TableCell>
+                    <TableCell className="text-right font-bold">
+                      {fmtBRL(stats.totals.loja)}
+                    </TableCell>
+                    <TableCell className="text-right font-bold">
+                      {fmtBRL(stats.totals.ml)}
+                    </TableCell>
+                    <TableCell className="text-right font-bold">
+                      {fmtBRL(stats.totals.full)}
+                    </TableCell>
+                    <TableCell className="text-right font-bold">
+                      {fmtBRL(stats.totals.total)}
+                    </TableCell>
                   </TableRow>
                 </TableFooter>
               </Table>

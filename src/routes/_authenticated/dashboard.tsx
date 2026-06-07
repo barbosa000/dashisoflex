@@ -6,19 +6,64 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
-  LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+  Legend,
 } from "recharts";
-import { fmtBRL, fmtPct, daysInMonth, monthKey, statusColor, totalDia, isoDate, parseISODate } from "@/lib/calc";
-import { ArrowUpRight, ArrowDownRight, Target, TrendingUp, Calendar, Store, ShoppingBag } from "lucide-react";
+import {
+  fmtBRL,
+  fmtPct,
+  daysInMonth,
+  monthKey,
+  statusColor,
+  totalDia,
+  isoDate,
+  parseISODate,
+} from "@/lib/calc";
+import {
+  ArrowUpRight,
+  ArrowDownRight,
+  Target,
+  TrendingUp,
+  Calendar,
+  Store,
+  ShoppingBag,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
 });
 
-const MONTHS = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+const MONTHS = [
+  "Janeiro",
+  "Fevereiro",
+  "Março",
+  "Abril",
+  "Maio",
+  "Junho",
+  "Julho",
+  "Agosto",
+  "Setembro",
+  "Outubro",
+  "Novembro",
+  "Dezembro",
+];
 
 function DashboardPage() {
   const today = new Date();
@@ -34,8 +79,10 @@ function DashboardPage() {
       const endD = new Date(year, month, 0);
       const end = `${year}-${String(month).padStart(2, "0")}-${String(endD.getDate()).padStart(2, "0")}`;
       const { data, error } = await supabase
-        .from("daily_sales").select("*")
-        .gte("sale_date", start).lte("sale_date", end)
+        .from("daily_sales")
+        .select("*")
+        .gte("sale_date", start)
+        .lte("sale_date", end)
         .order("sale_date", { ascending: true });
       if (error) throw error;
       return data ?? [];
@@ -46,8 +93,11 @@ function DashboardPage() {
     queryKey: ["goal", year, month],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("monthly_goals").select("*")
-        .eq("year", year).eq("month", month).maybeSingle();
+        .from("monthly_goals")
+        .select("*")
+        .eq("year", year)
+        .eq("month", month)
+        .maybeSingle();
       if (error) throw error;
       return data;
     },
@@ -62,20 +112,28 @@ function DashboardPage() {
   const metaDiaML = metaML / Math.max(totalDiasMes, 1);
 
   const acumulado = useMemo(() => {
-    let loja = 0, ml = 0, full = 0;
+    let loja = 0,
+      ml = 0,
+      full = 0;
     return sales.map((s) => {
       loja += Number(s.faturado_loja);
       ml += Number(s.mercado_livre);
       full += Number(s.full_value);
       const total = loja + ml + full;
       return {
-        date: parseISODate(s.sale_date).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }),
+        date: parseISODate(s.sale_date).toLocaleDateString("pt-BR", {
+          day: "2-digit",
+          month: "2-digit",
+        }),
         rawDate: s.sale_date,
         diario: totalDia(s),
         loja: Number(s.faturado_loja),
         ml: Number(s.mercado_livre),
         full: Number(s.full_value),
-        acumLoja: loja, acumML: ml, acumFull: full, acumTotal: total,
+        acumLoja: loja,
+        acumML: ml,
+        acumFull: full,
+        acumTotal: total,
       };
     });
   }, [sales]);
@@ -102,19 +160,37 @@ function DashboardPage() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold">Dashboard de Vendas</h1>
-          <p className="text-sm text-muted-foreground">Acompanhe a performance comercial em tempo real.</p>
+          <p className="text-sm text-muted-foreground">
+            Acompanhe a performance comercial em tempo real.
+          </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Select value={String(month)} onValueChange={(v) => setMonth(Number(v))}>
-            <SelectTrigger className="w-36"><SelectValue /></SelectTrigger>
-            <SelectContent>{MONTHS.map((m, i) => <SelectItem key={i} value={String(i + 1)}>{m}</SelectItem>)}</SelectContent>
+            <SelectTrigger className="w-36">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {MONTHS.map((m, i) => (
+                <SelectItem key={i} value={String(i + 1)}>
+                  {m}
+                </SelectItem>
+              ))}
+            </SelectContent>
           </Select>
           <Select value={String(year)} onValueChange={(v) => setYear(Number(v))}>
-            <SelectTrigger className="w-24"><SelectValue /></SelectTrigger>
-            <SelectContent>{Array.from({ length: 5 }).map((_, i) => {
-              const y = cur.year - 2 + i;
-              return <SelectItem key={y} value={String(y)}>{y}</SelectItem>;
-            })}</SelectContent>
+            <SelectTrigger className="w-24">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {Array.from({ length: 5 }).map((_, i) => {
+                const y = cur.year - 2 + i;
+                return (
+                  <SelectItem key={y} value={String(y)}>
+                    {y}
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
           </Select>
         </div>
       </div>
@@ -122,35 +198,63 @@ function DashboardPage() {
       {!goal && (
         <Card className="border-warning/40 bg-warning/5">
           <CardContent className="flex flex-wrap items-center justify-between gap-3 py-4">
-            <div className="text-sm">Nenhuma meta configurada para {MONTHS[month - 1]}/{year}.</div>
-            <Link to="/metas"><Button size="sm" variant="outline">Configurar metas</Button></Link>
+            <div className="text-sm">
+              Nenhuma meta configurada para {MONTHS[month - 1]}/{year}.
+            </div>
+            <Link to="/metas">
+              <Button size="sm" variant="outline">
+                Configurar metas
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       )}
 
       {/* Cards principais */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <KpiCard title="Faturado no mês" value={fmtBRL(totalMes)} icon={TrendingUp}
-          subtitle={`${acumulado.length} dia(s) lançado(s)`} />
-        <KpiCard title="Meta mensal" value={fmtBRL(metaTotal)} icon={Target}
-          subtitle={`Loja ${fmtBRL(metaLoja)} + ML ${fmtBRL(metaML)}`} />
-        <KpiCard title="% Atingido" value={fmtPct(pctMes)} icon={pctMes >= 100 ? ArrowUpRight : ArrowDownRight}
+        <KpiCard
+          title="Faturado no mês"
+          value={fmtBRL(totalMes)}
+          icon={TrendingUp}
+          subtitle={`${acumulado.length} dia(s) lançado(s)`}
+        />
+        <KpiCard
+          title="Meta mensal"
+          value={fmtBRL(metaTotal)}
+          icon={Target}
+          subtitle={`Loja ${fmtBRL(metaLoja)} + ML ${fmtBRL(metaML)}`}
+        />
+        <KpiCard
+          title="% Atingido"
+          value={fmtPct(pctMes)}
+          icon={pctMes >= 100 ? ArrowUpRight : ArrowDownRight}
           tone={statusColor(pctMes)}
-          subtitle={pctMes >= 100 ? "Meta batida!" : `Faltam ${fmtPct(100 - pctMes)}`} />
-        <KpiCard title="Falta para meta" value={fmtBRL(falta)} icon={Target}
-          subtitle={falta === 0 ? "Meta atingida" : "Para atingir o mês"} />
+          subtitle={pctMes >= 100 ? "Meta batida!" : `Faltam ${fmtPct(100 - pctMes)}`}
+        />
+        <KpiCard
+          title="Falta para meta"
+          value={fmtBRL(falta)}
+          icon={Target}
+          subtitle={falta === 0 ? "Meta atingida" : "Para atingir o mês"}
+        />
       </div>
 
       {/* % por canal */}
       <div className="grid gap-4 md:grid-cols-2">
         <ChannelProgress
-          icon={Store} title="Loja Virtual"
-          realizado={totalLojaMes} meta={metaLoja} pct={pctLoja}
+          icon={Store}
+          title="Loja Virtual"
+          realizado={totalLojaMes}
+          meta={metaLoja}
+          pct={pctLoja}
           subtitle={`Meta diária (${diasUteis} dias úteis): ${fmtBRL(metaDiaLoja)}`}
         />
         <ChannelProgress
-          icon={ShoppingBag} title="Mercado Livre"
-          realizado={totalMLMes} meta={metaML} pct={pctML}
+          icon={ShoppingBag}
+          title="Mercado Livre"
+          realizado={totalMLMes}
+          meta={metaML}
+          pct={pctML}
           subtitle={`Meta diária (${totalDiasMes} dias totais): ${fmtBRL(metaDiaML)}`}
         />
       </div>
@@ -160,26 +264,47 @@ function DashboardPage() {
         <CardHeader>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <CardTitle className="flex items-center gap-2 text-base font-semibold text-foreground"><Calendar className="h-4.5 w-4.5 text-primary" /> Detalhamento do dia</CardTitle>
-              <CardDescription className="text-xs text-muted-foreground/80">Veja o resultado de qualquer dia do mês.</CardDescription>
+              <CardTitle className="flex items-center gap-2 text-base font-semibold text-foreground">
+                <Calendar className="h-4.5 w-4.5 text-primary" /> Detalhamento do dia
+              </CardTitle>
+              <CardDescription className="text-xs text-muted-foreground/80">
+                Veja o resultado de qualquer dia do mês.
+              </CardDescription>
             </div>
-            <Input type="date" value={selectedDay} onChange={(e) => setSelectedDay(e.target.value)} className="max-w-[180px] bg-white text-sm" />
+            <Input
+              type="date"
+              value={selectedDay}
+              onChange={(e) => setSelectedDay(e.target.value)}
+              className="max-w-[180px] bg-white text-sm"
+            />
           </div>
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-3">
           <DayMetric
             title="Loja Virtual (dias úteis)"
-            realizado={diaLoja} meta={metaDiaLoja} pct={pctDiaLoja}
+            realizado={diaLoja}
+            meta={metaDiaLoja}
+            pct={pctDiaLoja}
           />
           <DayMetric
             title="Mercado Livre (dias totais)"
-            realizado={diaML} meta={metaDiaML} pct={pctDiaML}
+            realizado={diaML}
+            meta={metaDiaML}
+            pct={pctDiaML}
           />
           <div className="rounded-xl border border-primary/10 bg-gradient-to-br from-primary/5 to-primary/10 p-4 transition-all duration-200 hover:shadow-md">
-            <div className="text-xs font-semibold text-primary/80">Total do dia (Loja Virtual + ML + Full)</div>
+            <div className="text-xs font-semibold text-primary/80">
+              Total do dia (Loja Virtual + ML + Full)
+            </div>
             <div className="mt-1.5 text-2xl font-black text-primary">{fmtBRL(diaTotal)}</div>
-            <div className="mt-2 text-xs font-medium text-muted-foreground">Full: {fmtBRL(diaFull)}</div>
-            {!dia && <div className="mt-2 text-xs font-semibold text-amber-600">Sem lançamento para este dia.</div>}
+            <div className="mt-2 text-xs font-medium text-muted-foreground">
+              Full: {fmtBRL(diaFull)}
+            </div>
+            {!dia && (
+              <div className="mt-2 text-xs font-semibold text-amber-600">
+                Sem lançamento para este dia.
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -188,17 +313,33 @@ function DashboardPage() {
       <div className="grid gap-4 lg:grid-cols-2">
         <Card className="custom-shadow border-slate-100/80">
           <CardHeader>
-            <CardTitle className="text-base font-semibold text-foreground">Faturamento diário</CardTitle>
-            <CardDescription className="text-xs text-muted-foreground/80">Total por dia (Loja Virtual + ML + Full)</CardDescription>
+            <CardTitle className="text-base font-semibold text-foreground">
+              Faturamento diário
+            </CardTitle>
+            <CardDescription className="text-xs text-muted-foreground/80">
+              Total por dia (Loja Virtual + ML + Full)
+            </CardDescription>
           </CardHeader>
           <CardContent className="h-72">
             <ResponsiveContainer>
               <BarChart data={acumulado}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-slate-100" />
                 <XAxis dataKey="date" fontSize={11} stroke="#64748b" />
-                <YAxis fontSize={11} stroke="#64748b" tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`} />
-                <Tooltip formatter={(v: number) => fmtBRL(v)} contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0' }} />
-                <Bar dataKey="diario" name="Total dia" fill="var(--color-chart-1)" radius={[4, 4, 0, 0]} />
+                <YAxis
+                  fontSize={11}
+                  stroke="#64748b"
+                  tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`}
+                />
+                <Tooltip
+                  formatter={(v: number) => fmtBRL(v)}
+                  contentStyle={{ borderRadius: "8px", border: "1px solid #e2e8f0" }}
+                />
+                <Bar
+                  dataKey="diario"
+                  name="Total dia"
+                  fill="var(--color-chart-1)"
+                  radius={[4, 4, 0, 0]}
+                />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -206,19 +347,45 @@ function DashboardPage() {
 
         <Card className="custom-shadow border-slate-100/80">
           <CardHeader>
-            <CardTitle className="text-base font-semibold text-foreground">Evolução acumulada vs meta</CardTitle>
-            <CardDescription className="text-xs text-muted-foreground/80">Acumulado no mês comparado à meta total</CardDescription>
+            <CardTitle className="text-base font-semibold text-foreground">
+              Evolução acumulada vs meta
+            </CardTitle>
+            <CardDescription className="text-xs text-muted-foreground/80">
+              Acumulado no mês comparado à meta total
+            </CardDescription>
           </CardHeader>
           <CardContent className="h-72">
             <ResponsiveContainer>
               <LineChart data={acumulado.map((a) => ({ ...a, meta: metaTotal }))}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-slate-100" />
                 <XAxis dataKey="date" fontSize={11} stroke="#64748b" />
-                <YAxis fontSize={11} stroke="#64748b" tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`} />
-                <Tooltip formatter={(v: number) => fmtBRL(v)} contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0' }} />
-                <Legend iconType="circle" wrapperStyle={{ fontSize: '12px' }} />
-                <Line type="monotone" dataKey="acumTotal" name="Realizado" stroke="var(--color-chart-1)" strokeWidth={3} dot={false} />
-                <Line type="monotone" dataKey="meta" name="Meta" stroke="var(--color-chart-4)" strokeWidth={2} strokeDasharray="5 5" dot={false} />
+                <YAxis
+                  fontSize={11}
+                  stroke="#64748b"
+                  tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`}
+                />
+                <Tooltip
+                  formatter={(v: number) => fmtBRL(v)}
+                  contentStyle={{ borderRadius: "8px", border: "1px solid #e2e8f0" }}
+                />
+                <Legend iconType="circle" wrapperStyle={{ fontSize: "12px" }} />
+                <Line
+                  type="monotone"
+                  dataKey="acumTotal"
+                  name="Realizado"
+                  stroke="var(--color-chart-1)"
+                  strokeWidth={3}
+                  dot={false}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="meta"
+                  name="Meta"
+                  stroke="var(--color-chart-4)"
+                  strokeWidth={2}
+                  strokeDasharray="5 5"
+                  dot={false}
+                />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
@@ -229,27 +396,43 @@ function DashboardPage() {
 }
 
 function KpiCard({
-  title, value, subtitle, icon: Icon, tone,
+  title,
+  value,
+  subtitle,
+  icon: Icon,
+  tone,
 }: {
-  title: string; value: string; subtitle?: string;
+  title: string;
+  value: string;
+  subtitle?: string;
   icon: React.ComponentType<{ className?: string }>;
   tone?: "success" | "warning" | "destructive";
 }) {
   const toneClasses =
-    tone === "success" ? "bg-success/10 text-success" :
-    tone === "warning" ? "bg-warning/15 text-warning-foreground" :
-    tone === "destructive" ? "bg-destructive/10 text-destructive" :
-    "bg-primary/10 text-primary";
+    tone === "success"
+      ? "bg-success/10 text-success"
+      : tone === "warning"
+        ? "bg-warning/15 text-warning-foreground"
+        : tone === "destructive"
+          ? "bg-destructive/10 text-destructive"
+          : "bg-primary/10 text-primary";
   return (
     <Card className="card-hover-effect custom-shadow border-slate-100/80">
       <CardContent className="pt-6">
         <div className="flex items-start justify-between">
           <div>
-            <div className="text-xs uppercase tracking-wide font-semibold text-muted-foreground">{title}</div>
+            <div className="text-xs uppercase tracking-wide font-semibold text-muted-foreground">
+              {title}
+            </div>
             <div className="mt-1.5 text-2xl font-bold tracking-tight text-foreground">{value}</div>
             {subtitle && <div className="mt-1 text-xs text-muted-foreground/80">{subtitle}</div>}
           </div>
-          <div className={cn("flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-300", toneClasses)}>
+          <div
+            className={cn(
+              "flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-300",
+              toneClasses,
+            )}
+          >
             <Icon className="h-5 w-5" />
           </div>
         </div>
@@ -259,15 +442,23 @@ function KpiCard({
 }
 
 function ChannelProgress({
-  icon: Icon, title, realizado, meta, pct, subtitle,
+  icon: Icon,
+  title,
+  realizado,
+  meta,
+  pct,
+  subtitle,
 }: {
   icon: React.ComponentType<{ className?: string }>;
-  title: string; realizado: number; meta: number; pct: number; subtitle: string;
+  title: string;
+  realizado: number;
+  meta: number;
+  pct: number;
+  subtitle: string;
 }) {
   const tone = statusColor(pct);
   const barColor =
-    tone === "success" ? "bg-success" :
-    tone === "warning" ? "bg-warning" : "bg-destructive";
+    tone === "success" ? "bg-success" : tone === "warning" ? "bg-warning" : "bg-destructive";
   return (
     <Card className="card-hover-effect custom-shadow border-slate-100/80">
       <CardHeader className="pb-2">
@@ -289,7 +480,10 @@ function ChannelProgress({
           <span className="font-semibold text-foreground">{fmtBRL(meta)}</span>
         </div>
         <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
-          <div className={cn("h-full transition-all duration-500 rounded-full", barColor)} style={{ width: `${Math.min(pct, 100)}%` }} />
+          <div
+            className={cn("h-full transition-all duration-500 rounded-full", barColor)}
+            style={{ width: `${Math.min(pct, 100)}%` }}
+          />
         </div>
         <div className="text-right text-sm font-bold text-foreground">{fmtPct(pct)}</div>
       </CardContent>
@@ -298,8 +492,16 @@ function ChannelProgress({
 }
 
 function DayMetric({
-  title, realizado, meta, pct,
-}: { title: string; realizado: number; meta: number; pct: number }) {
+  title,
+  realizado,
+  meta,
+  pct,
+}: {
+  title: string;
+  realizado: number;
+  meta: number;
+  pct: number;
+}) {
   const tone = statusColor(pct);
   return (
     <div className="rounded-xl border border-slate-100/80 bg-white p-4 custom-shadow card-hover-effect">
@@ -309,18 +511,42 @@ function DayMetric({
       </div>
       <div className="mt-2 text-xl font-bold text-foreground">{fmtBRL(realizado)}</div>
       <div className="text-xs text-muted-foreground">Meta: {fmtBRL(meta)}</div>
-      <div className={cn(
-        "mt-1 text-xs font-semibold",
-        tone === "success" ? "text-success" : tone === "warning" ? "text-warning-foreground" : "text-destructive",
-      )}>{fmtPct(pct)} da meta diária</div>
+      <div
+        className={cn(
+          "mt-1 text-xs font-semibold",
+          tone === "success"
+            ? "text-success"
+            : tone === "warning"
+              ? "text-warning-foreground"
+              : "text-destructive",
+        )}
+      >
+        {fmtPct(pct)} da meta diária
+      </div>
     </div>
   );
 }
 
 function StatusBadge({ pct }: { pct: number }) {
   const tone = statusColor(pct);
-  if (tone === "success") return <Badge className="bg-success text-success-foreground hover:bg-success border-none shadow-none font-medium px-2 py-0.5 text-xs">Atingiu</Badge>;
-  if (tone === "warning") return <Badge className="bg-warning text-warning-foreground hover:bg-warning border-none shadow-none font-medium px-2 py-0.5 text-xs">Atenção</Badge>;
-  return <Badge variant="destructive" className="border-none shadow-none font-medium px-2 py-0.5 text-xs">Abaixo</Badge>;
+  if (tone === "success")
+    return (
+      <Badge className="bg-success text-success-foreground hover:bg-success border-none shadow-none font-medium px-2 py-0.5 text-xs">
+        Atingiu
+      </Badge>
+    );
+  if (tone === "warning")
+    return (
+      <Badge className="bg-warning text-warning-foreground hover:bg-warning border-none shadow-none font-medium px-2 py-0.5 text-xs">
+        Atenção
+      </Badge>
+    );
+  return (
+    <Badge
+      variant="destructive"
+      className="border-none shadow-none font-medium px-2 py-0.5 text-xs"
+    >
+      Abaixo
+    </Badge>
+  );
 }
-

@@ -1,0 +1,16 @@
+# Force LF line endings for all text files (required for Lovable/Linux build)
+* text=auto eol=lf
+
+# Explicitly declare binary files to prevent line ending conversion
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.svg binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.otf binary
+*.lock binary
