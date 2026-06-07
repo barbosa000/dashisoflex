@@ -133,12 +133,16 @@ export const updateUser = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { user_id, role, permissions, ...profile } = data;
 
-    const profilePatch: Record<string, unknown> = {};
-    (["full_name","phone","cargo","setor","status"] as const).forEach((k) => {
-      if (k in profile && (profile as never as Record<string, unknown>)[k] !== undefined) {
-        profilePatch[k] = (profile as never as Record<string, unknown>)[k];
-      }
-    });
+    const profilePatch: {
+      full_name?: string; phone?: string | null;
+      cargo?: string | null; setor?: string | null;
+      status?: "ativo"|"inativo"|"bloqueado";
+    } = {};
+    if (profile.full_name !== undefined) profilePatch.full_name = profile.full_name;
+    if (profile.phone !== undefined) profilePatch.phone = profile.phone;
+    if (profile.cargo !== undefined) profilePatch.cargo = profile.cargo;
+    if (profile.setor !== undefined) profilePatch.setor = profile.setor;
+    if (profile.status !== undefined) profilePatch.status = profile.status;
     if (Object.keys(profilePatch).length) {
       await supabaseAdmin.from("profiles").update(profilePatch).eq("id", user_id);
     }
