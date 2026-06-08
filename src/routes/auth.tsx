@@ -40,10 +40,18 @@ function AuthPage() {
     try {
       const { data } = await supabase.rpc("record_login_attempt", {
         _email: targetEmail,
-        _ip: null,
+        _ip: "",
         _ua: navigator.userAgent.slice(0, 200),
         _success: success,
       });
+      const r = data as { locked: boolean; locked_until?: string; attempts_remaining?: number };
+      setLock({ locked: r?.locked, until: r?.locked_until, remaining: r?.attempts_remaining });
+      return r;
+    } catch {
+      return null;
+    }
+  }
+
       const r = data as { locked: boolean; locked_until?: string; attempts_remaining?: number };
       setLock({ locked: r?.locked, until: r?.locked_until, remaining: r?.attempts_remaining });
       return r;
