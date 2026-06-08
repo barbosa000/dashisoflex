@@ -2,6 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useMe } from "@/hooks/use-me";
+
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -155,6 +157,8 @@ function DashboardPage() {
   const pctDiaLoja = metaDiaLoja > 0 ? (diaLoja / metaDiaLoja) * 100 : 0;
   const pctDiaML = metaDiaML > 0 ? (diaML / metaDiaML) * 100 : 0;
 
+  const { data: me } = useMe();
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
@@ -163,7 +167,13 @@ function DashboardPage() {
           <p className="text-sm text-muted-foreground">
             Acompanhe a performance comercial em tempo real.
           </p>
+          {me?.profile?.last_login && (
+            <p className="mt-1 text-xs text-muted-foreground">
+              Último acesso: {new Date(me.profile.last_login).toLocaleString("pt-BR")}
+            </p>
+          )}
         </div>
+
         <div className="flex flex-wrap gap-2">
           <Select value={String(month)} onValueChange={(v) => setMonth(Number(v))}>
             <SelectTrigger className="w-36">

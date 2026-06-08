@@ -89,6 +89,33 @@ export type Database = {
         }
         Relationships: []
       }
+      login_attempts: {
+        Row: {
+          attempted_at: string
+          email: string
+          id: string
+          ip_address: string | null
+          success: boolean
+          user_agent: string | null
+        }
+        Insert: {
+          attempted_at?: string
+          email: string
+          id?: string
+          ip_address?: string | null
+          success?: boolean
+          user_agent?: string | null
+        }
+        Update: {
+          attempted_at?: string
+          email?: string
+          id?: string
+          ip_address?: string | null
+          success?: boolean
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       monthly_goals: {
         Row: {
           created_at: string
@@ -214,6 +241,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_login_lock: { Args: { _email: string }; Returns: Json }
       has_permission: {
         Args: {
           _module: Database["public"]["Enums"]["app_module"]
@@ -229,6 +257,10 @@ export type Database = {
         Returns: boolean
       }
       is_admin_master: { Args: { _user_id: string }; Returns: boolean }
+      record_login_attempt: {
+        Args: { _email: string; _ip: string; _success: boolean; _ua: string }
+        Returns: Json
+      }
     }
     Enums: {
       app_module:

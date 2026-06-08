@@ -78,10 +78,21 @@ type ModuleKey = (typeof MODULES)[number]["key"];
 type Role = "admin_master" | "gestor" | "colaborador";
 
 const ROLE_LABEL: Record<Role, string> = {
-  admin_master: "Administrador Master",
-  gestor: "Gestor",
-  colaborador: "Colaborador",
+  admin_master: "Administrador",
+  gestor: "Gerente",
+  colaborador: "Usuário",
 };
+
+// Presets de permissões aplicados ao mudar o perfil
+const ROLE_PRESETS: Record<Role, ModuleKey[]> = {
+  admin_master: [
+    "dashboard","lancamento","historico","metas","relatorio",
+    "marketing","comercial","financeiro","rh","producao","configuracoes","usuarios",
+  ],
+  gestor: ["dashboard","lancamento","historico","metas","relatorio","comercial","marketing"],
+  colaborador: ["dashboard","lancamento","historico"],
+};
+
 
 function UsuariosPage() {
   const { data: me } = useMe();
@@ -508,18 +519,23 @@ function UserFormDialog({
               <Field label="Perfil de acesso *">
                 <Select
                   value={form.role}
-                  onValueChange={(v) => setForm({ ...form, role: v as Role })}
+                  onValueChange={(v) => {
+                    const newRole = v as Role;
+                    setForm({ ...form, role: newRole });
+                    setPerms(new Set(ROLE_PRESETS[newRole]));
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="admin_master">Administrador Master</SelectItem>
-                    <SelectItem value="gestor">Gestor</SelectItem>
-                    <SelectItem value="colaborador">Colaborador</SelectItem>
+                    <SelectItem value="admin_master">Administrador</SelectItem>
+                    <SelectItem value="gestor">Gerente</SelectItem>
+                    <SelectItem value="colaborador">Usuário</SelectItem>
                   </SelectContent>
                 </Select>
               </Field>
+
               {isEdit && (
                 <Field label="Status">
                   <Select
