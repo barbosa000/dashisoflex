@@ -52,13 +52,7 @@ function AuthPage() {
     }
   }
 
-      const r = data as { locked: boolean; locked_until?: string; attempts_remaining?: number };
-      setLock({ locked: r?.locked, until: r?.locked_until, remaining: r?.attempts_remaining });
-      return r;
-    } catch {
-      return null;
-    }
-  }
+
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
