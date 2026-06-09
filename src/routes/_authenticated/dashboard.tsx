@@ -20,6 +20,8 @@ import {
   Line,
   BarChart,
   Bar,
+  Cell,
+  ReferenceLine,
   XAxis,
   YAxis,
   Tooltip,
