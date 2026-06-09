@@ -346,13 +346,20 @@ function DashboardPage() {
                   formatter={(v: number) => fmtBRL(v)}
                   contentStyle={{ borderRadius: "8px", border: "1px solid #e2e8f0" }}
                 />
-                <Bar
-                  dataKey="diario"
-                  name="Total dia"
-                  fill="var(--color-chart-1)"
-                  radius={[4, 4, 0, 0]}
+                <ReferenceLine
+                  y={metaDiaLoja + metaDiaML}
+                  stroke="#0f52ba"
+                  strokeDasharray="4 4"
+                  label={{ value: "Meta diária", position: "insideTopRight", fontSize: 10, fill: "#0f52ba" }}
                 />
-              </BarChart>
+                <Bar dataKey="diario" name="Total dia" radius={[6, 6, 0, 0]}>
+                  {acumulado.map((d, i) => {
+                    const metaDay = metaDiaLoja + metaDiaML;
+                    const p = metaDay > 0 ? (d.diario / metaDay) * 100 : 0;
+                    const color = p >= 100 ? "#10b981" : p >= 80 ? "#f59e0b" : "#ef4444";
+                    return <Cell key={i} fill={color} />;
+                  })}
+                </Bar>
             </ResponsiveContainer>
           </CardContent>
         </Card>
