@@ -360,6 +360,7 @@ function DashboardPage() {
                     return <Cell key={i} fill={color} />;
                   })}
                 </Bar>
+              </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
