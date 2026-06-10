@@ -239,28 +239,117 @@ function RelatorioPage() {
         <Card className="custom-shadow">
           <CardHeader className="pb-3">
             <CardTitle className="text-base">Período do Relatório</CardTitle>
-            <CardDescription>Filtre o mês para visualizar e exportar.</CardDescription>
+            <CardDescription>
+              Filtre por mês inteiro ou escolha um intervalo personalizado de datas.
+            </CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-wrap gap-3">
-            <Select value={String(month)} onValueChange={(v) => setMonth(Number(v))}>
-              <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {MONTHS.map((m, i) => (
-                  <SelectItem key={i} value={String(i + 1)}>{m}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={String(year)} onValueChange={(v) => setYear(Number(v))}>
-              <SelectTrigger className="w-28"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {Array.from({ length: 5 }).map((_, i) => {
-                  const y = cur.year - 2 + i;
-                  return <SelectItem key={y} value={String(y)}>{y}</SelectItem>;
-                })}
-              </SelectContent>
-            </Select>
+          <CardContent className="space-y-4">
+            <div className="inline-flex rounded-lg border bg-muted/30 p-1 text-xs">
+              <button
+                type="button"
+                onClick={() => setMode("month")}
+                className={cn(
+                  "rounded-md px-3 py-1.5 font-medium transition",
+                  mode === "month" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground",
+                )}
+              >
+                Por mês
+              </button>
+              <button
+                type="button"
+                onClick={() => setMode("range")}
+                className={cn(
+                  "rounded-md px-3 py-1.5 font-medium transition",
+                  mode === "range" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground",
+                )}
+              >
+                Intervalo de datas
+              </button>
+            </div>
+
+            {mode === "month" ? (
+              <div className="flex flex-wrap gap-3">
+                <Select value={String(month)} onValueChange={(v) => setMonth(Number(v))}>
+                  <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {MONTHS.map((m, i) => (
+                      <SelectItem key={i} value={String(i + 1)}>{m}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={String(year)} onValueChange={(v) => setYear(Number(v))}>
+                  <SelectTrigger className="w-28"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {Array.from({ length: 5 }).map((_, i) => {
+                      const y = cur.year - 2 + i;
+                      return <SelectItem key={y} value={String(y)}>{y}</SelectItem>;
+                    })}
+                  </SelectContent>
+                </Select>
+              </div>
+            ) : (
+              <div className="flex flex-wrap items-end gap-3">
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground">De</label>
+                  <input
+                    type="date"
+                    value={dateStart}
+                    max={dateEnd}
+                    onChange={(e) => setDateStart(e.target.value)}
+                    className="block mt-1 h-9 rounded-md border border-input bg-background px-3 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground">Até</label>
+                  <input
+                    type="date"
+                    value={dateEnd}
+                    min={dateStart}
+                    onChange={(e) => setDateEnd(e.target.value)}
+                    className="block mt-1 h-9 rounded-md border border-input bg-background px-3 text-sm"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      const t = new Date();
+                      const start = new Date(t);
+                      start.setDate(t.getDate() - 6);
+                      const iso = (d: Date) =>
+                        `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+                      setDateStart(iso(start));
+                      setDateEnd(iso(t));
+                    }}
+                  >
+                    Últimos 7 dias
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      const t = new Date();
+                      const start = new Date(t);
+                      start.setDate(t.getDate() - 29);
+                      const iso = (d: Date) =>
+                        `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+                      setDateStart(iso(start));
+                      setDateEnd(iso(t));
+                    }}
+                  >
+                    Últimos 30 dias
+                  </Button>
+                </div>
+                <div className="ml-auto text-xs text-muted-foreground">
+                  Período: <span className="font-semibold text-foreground">{period.label}</span> ·{" "}
+                  {period.days} dia(s)
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
+
 
         {/* KPIs */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
