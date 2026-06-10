@@ -69,33 +69,59 @@ function RelatorioPage() {
   const cur = monthKey(new Date());
   const [year, setYear] = useState(cur.year);
   const [month, setMonth] = useState(cur.month);
+  const [mode, setMode] = useState<"month" | "range">("month");
+  // Range filter defaults to current month
+  const defaultStart = `${cur.year}-${String(cur.month).padStart(2, "0")}-01`;
+  const defaultEnd = `${cur.year}-${String(cur.month).padStart(2, "0")}-${String(
+    daysInMonth(cur.year, cur.month),
+  ).padStart(2, "0")}`;
+  const [dateStart, setDateStart] = useState(defaultStart);
+  const [dateEnd, setDateEnd] = useState(defaultEnd);
   const reportRef = useRef<HTMLDivElement>(null);
 
-  const { data: sales = [] } = useQuery({
-    queryKey: ["sales", year, month],
-    queryFn: async () => {
+  const period = useMemo(() => {
+    if (mode === "month") {
       const start = `${year}-${String(month).padStart(2, "0")}-01`;
       const endD = new Date(year, month, 0);
       const end = `${year}-${String(month).padStart(2, "0")}-${String(endD.getDate()).padStart(2, "0")}`;
+      return { start, end, label: `${MONTHS[month - 1]}/${year}`, days: endD.getDate() };
+    }
+    const s = parseISODate(dateStart);
+    const e = parseISODate(dateEnd);
+    const days = Math.max(Math.round((e.getTime() - s.getTime()) / 86400000) + 1, 1);
+    return {
+      start: dateStart,
+      end: dateEnd,
+      label: `${s.toLocaleDateString("pt-BR")} → ${e.toLocaleDateString("pt-BR")}`,
+      days,
+    };
+  }, [mode, year, month, dateStart, dateEnd]);
+
+  const { data: sales = [] } = useQuery({
+    queryKey: ["sales-period", period.start, period.end],
+    queryFn: async () => {
       const { data, error } = await supabase
         .from("daily_sales")
         .select("*")
-        .gte("sale_date", start)
-        .lte("sale_date", end)
+        .gte("sale_date", period.start)
+        .lte("sale_date", period.end)
         .order("sale_date", { ascending: true });
       if (error) throw error;
       return data ?? [];
     },
   });
 
+  // Metas: usa o mês selecionado (modo mês) ou o mês inicial do range
+  const refMonth = mode === "month" ? month : parseISODate(period.start).getMonth() + 1;
+  const refYear = mode === "month" ? year : parseISODate(period.start).getFullYear();
   const { data: goal } = useQuery({
-    queryKey: ["goal", year, month],
+    queryKey: ["goal", refYear, refMonth],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("monthly_goals")
         .select("*")
-        .eq("year", year)
-        .eq("month", month)
+        .eq("year", refYear)
+        .eq("month", refMonth)
         .maybeSingle();
       if (error) throw error;
       return data;
