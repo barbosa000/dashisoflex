@@ -152,6 +152,83 @@ export type Database = {
         }
         Relationships: []
       }
+      product_sales: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          product_id: string
+          quantity: number
+          sale_date: string
+          total_value: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          product_id: string
+          quantity?: number
+          sale_date: string
+          total_value?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          product_id?: string
+          quantity?: number
+          sale_date?: string
+          total_value?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_sales_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string | null
+          id: string
+          image_url: string | null
+          name: string
+          price: number | null
+          sku: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          price?: number | null
+          sku?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          price?: number | null
+          sku?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -276,6 +353,7 @@ export type Database = {
         | "producao"
         | "configuracoes"
         | "usuarios"
+        | "top_produtos"
       app_role: "admin_master" | "gestor" | "colaborador"
       user_status: "ativo" | "inativo" | "bloqueado"
     }
@@ -418,6 +496,7 @@ export const Constants = {
         "producao",
         "configuracoes",
         "usuarios",
+        "top_produtos",
       ],
       app_role: ["admin_master", "gestor", "colaborador"],
       user_status: ["ativo", "inativo", "bloqueado"],

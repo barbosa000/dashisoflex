@@ -65,6 +65,7 @@ const MODULES = [
   { key: "historico", label: "Histórico" },
   { key: "metas", label: "Metas" },
   { key: "relatorio", label: "Relatórios" },
+  { key: "top_produtos", label: "TOP 10 Produtos" },
   { key: "marketing", label: "Marketing" },
   { key: "comercial", label: "Comercial" },
   { key: "financeiro", label: "Financeiro" },
@@ -83,14 +84,13 @@ const ROLE_LABEL: Record<Role, string> = {
   colaborador: "Usuário",
 };
 
-// Presets de permissões aplicados ao mudar o perfil
 const ROLE_PRESETS: Record<Role, ModuleKey[]> = {
   admin_master: [
-    "dashboard","lancamento","historico","metas","relatorio",
+    "dashboard","lancamento","historico","metas","relatorio","top_produtos",
     "marketing","comercial","financeiro","rh","producao","configuracoes","usuarios",
   ],
-  gestor: ["dashboard","lancamento","historico","metas","relatorio","comercial","marketing"],
-  colaborador: ["dashboard","lancamento","historico"],
+  gestor: ["dashboard","lancamento","historico","metas","relatorio","top_produtos","comercial","marketing"],
+  colaborador: ["dashboard","lancamento","historico","top_produtos"],
 };
 
 
@@ -366,8 +366,13 @@ function UserFormDialog({
   const [perms, setPerms] = useState<Set<ModuleKey>>(
     new Set((user?.permissions as ModuleKey[]) ?? ["dashboard"]),
   );
+  const [pwMode, setPwMode] = useState<"manual" | "auto">("manual");
+  const [password, setPassword] = useState("");
+  const [sendInvite, setSendInvite] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [tempPw, setTempPw] = useState<string | null>(null);
   const [emailSent, setEmailSent] = useState(false);
+  const [pwSetByAdmin, setPwSetByAdmin] = useState(false);
 
   const create = useServerFn(createUser);
   const update = useServerFn(updateUser);
@@ -398,15 +403,22 @@ function UserFormDialog({
           setor: form.setor || null,
           role: form.role,
           permissions,
+          password: pwMode === "manual" ? password : null,
+          send_invite: pwMode === "manual" ? sendInvite : true,
         },
       });
     },
     onSuccess: (res) => {
-      if (!isEdit && res && "tempPassword" in res) {
-        setTempPw(res.tempPassword);
-        setEmailSent(res.emailSent);
+      if (!isEdit && res && "passwordSetByAdmin" in res) {
+        setPwSetByAdmin(!!res.passwordSetByAdmin);
+        setEmailSent(!!res.emailSent);
+        setTempPw(res.tempPassword ?? (pwMode === "manual" ? password : null));
         toast.success(
-          res.emailSent ? "Usuário criado — convite enviado por email" : "Usuário criado",
+          res.passwordSetByAdmin
+            ? "Usuário criado com a senha definida"
+            : res.emailSent
+              ? "Usuário criado — convite enviado por email"
+              : "Usuário criado",
         );
       } else {
         toast.success("Alterações salvas");
@@ -435,16 +447,26 @@ function UserFormDialog({
           <DialogTitle>{isEdit ? "Editar usuário" : "Novo usuário"}</DialogTitle>
         </DialogHeader>
 
-        {tempPw ? (
+        {tempPw !== null || pwSetByAdmin ? (
           <div className="space-y-4">
             <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm">
               <p className="font-semibold text-emerald-900">Usuário criado com sucesso.</p>
               <p className="mt-1 text-emerald-800">
-                {emailSent ? (
+                {pwSetByAdmin && !emailSent && (
+                  <>A senha definida já está ativa. Repasse ao usuário em segurança.</>
+                )}
+                {pwSetByAdmin && emailSent && (
+                  <>
+                    A senha definida está ativa e um e-mail de boas-vindas foi enviado para{" "}
+                    <strong>{form.email}</strong>.
+                  </>
+                )}
+                {!pwSetByAdmin && emailSent && (
                   <>
                     Um convite foi enviado para <strong>{form.email}</strong> definir a senha.
                   </>
-                ) : (
+                )}
+                {!pwSetByAdmin && !emailSent && (
                   <>
                     Não foi possível enviar o email automaticamente. Repasse a senha temporária
                     manualmente.
@@ -452,23 +474,27 @@ function UserFormDialog({
                 )}
               </p>
             </div>
-            <div>
-              <Label>Senha temporária</Label>
-              <div className="mt-1 flex gap-2">
-                <Input readOnly value={tempPw} className="font-mono" />
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    navigator.clipboard.writeText(tempPw);
-                    toast.success("Copiado");
-                  }}
-                >
-                  <Copy className="h-4 w-4" />
-                </Button>
+            {tempPw && (
+              <div>
+                <Label>{pwSetByAdmin ? "Senha definida" : "Senha temporária"}</Label>
+                <div className="mt-1 flex gap-2">
+                  <Input readOnly value={tempPw} className="font-mono" />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      navigator.clipboard.writeText(tempPw);
+                      toast.success("Copiado");
+                    }}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Guarde — só será exibida agora.
+                </p>
               </div>
-              <p className="mt-1 text-xs text-muted-foreground">Guarde — só será exibida agora.</p>
-            </div>
+            )}
             <DialogFooter>
               <Button onClick={onClose}>Fechar</Button>
             </DialogFooter>
@@ -556,6 +582,73 @@ function UserFormDialog({
                 </Field>
               )}
             </div>
+
+            {!isEdit && (
+              <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Lock className="h-4 w-4 text-primary" />
+                  <p className="text-sm font-semibold">Senha de acesso</p>
+                </div>
+                <div className="flex gap-2 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => setPwMode("manual")}
+                    className={`flex-1 rounded-md border px-3 py-2 font-medium transition ${pwMode === "manual" ? "border-primary bg-primary/10 text-primary" : "bg-card text-muted-foreground hover:bg-muted"}`}
+                  >
+                    Definir agora
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPwMode("auto")}
+                    className={`flex-1 rounded-md border px-3 py-2 font-medium transition ${pwMode === "auto" ? "border-primary bg-primary/10 text-primary" : "bg-card text-muted-foreground hover:bg-muted"}`}
+                  >
+                    Gerar automática + enviar por email
+                  </button>
+                </div>
+                {pwMode === "manual" ? (
+                  <>
+                    <Field label="Senha *">
+                      <div className="flex gap-2">
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          placeholder="Mín. 8 caracteres, 1 maiúscula e 1 número"
+                          required
+                          minLength={8}
+                          autoComplete="new-password"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          onClick={() => setShowPassword((v) => !v)}
+                          title={showPassword ? "Ocultar" : "Mostrar"}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </Field>
+                    <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Checkbox
+                        checked={sendInvite}
+                        onCheckedChange={(c) => setSendInvite(c === true)}
+                      />
+                      <span className="flex items-center gap-1.5">
+                        <Mail className="h-3.5 w-3.5" /> Também enviar e-mail de boas-vindas para o
+                        usuário
+                      </span>
+                    </label>
+                  </>
+                ) : (
+                  <p className="text-xs text-muted-foreground">
+                    Uma senha temporária será gerada e o sistema enviará um convite por e-mail para
+                    o usuário definir a própria senha.
+                  </p>
+                )}
+              </div>
+            )}
+
 
             <div className="rounded-lg border bg-muted/30 p-4">
               <div className="mb-3 flex items-center gap-2">

@@ -69,33 +69,59 @@ function RelatorioPage() {
   const cur = monthKey(new Date());
   const [year, setYear] = useState(cur.year);
   const [month, setMonth] = useState(cur.month);
+  const [mode, setMode] = useState<"month" | "range">("month");
+  // Range filter defaults to current month
+  const defaultStart = `${cur.year}-${String(cur.month).padStart(2, "0")}-01`;
+  const defaultEnd = `${cur.year}-${String(cur.month).padStart(2, "0")}-${String(
+    daysInMonth(cur.year, cur.month),
+  ).padStart(2, "0")}`;
+  const [dateStart, setDateStart] = useState(defaultStart);
+  const [dateEnd, setDateEnd] = useState(defaultEnd);
   const reportRef = useRef<HTMLDivElement>(null);
 
-  const { data: sales = [] } = useQuery({
-    queryKey: ["sales", year, month],
-    queryFn: async () => {
+  const period = useMemo(() => {
+    if (mode === "month") {
       const start = `${year}-${String(month).padStart(2, "0")}-01`;
       const endD = new Date(year, month, 0);
       const end = `${year}-${String(month).padStart(2, "0")}-${String(endD.getDate()).padStart(2, "0")}`;
+      return { start, end, label: `${MONTHS[month - 1]}/${year}`, days: endD.getDate() };
+    }
+    const s = parseISODate(dateStart);
+    const e = parseISODate(dateEnd);
+    const days = Math.max(Math.round((e.getTime() - s.getTime()) / 86400000) + 1, 1);
+    return {
+      start: dateStart,
+      end: dateEnd,
+      label: `${s.toLocaleDateString("pt-BR")} → ${e.toLocaleDateString("pt-BR")}`,
+      days,
+    };
+  }, [mode, year, month, dateStart, dateEnd]);
+
+  const { data: sales = [] } = useQuery({
+    queryKey: ["sales-period", period.start, period.end],
+    queryFn: async () => {
       const { data, error } = await supabase
         .from("daily_sales")
         .select("*")
-        .gte("sale_date", start)
-        .lte("sale_date", end)
+        .gte("sale_date", period.start)
+        .lte("sale_date", period.end)
         .order("sale_date", { ascending: true });
       if (error) throw error;
       return data ?? [];
     },
   });
 
+  // Metas: usa o mês selecionado (modo mês) ou o mês inicial do range
+  const refMonth = mode === "month" ? month : parseISODate(period.start).getMonth() + 1;
+  const refYear = mode === "month" ? year : parseISODate(period.start).getFullYear();
   const { data: goal } = useQuery({
-    queryKey: ["goal", year, month],
+    queryKey: ["goal", refYear, refMonth],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("monthly_goals")
         .select("*")
-        .eq("year", year)
-        .eq("month", month)
+        .eq("year", refYear)
+        .eq("month", refMonth)
         .maybeSingle();
       if (error) throw error;
       return data;
@@ -105,7 +131,7 @@ function RelatorioPage() {
   const metaLoja = Number(goal?.meta_loja ?? 0);
   const metaML = Number(goal?.meta_mercado_livre ?? 0);
   const diasUteis = Number(goal?.dias_uteis ?? 22);
-  const totalDiasMes = daysInMonth(year, month);
+  const totalDiasMes = period.days;
   const metaTotal = metaLoja + metaML;
   const metaDiaTotal = metaLoja / Math.max(diasUteis, 1) + metaML / Math.max(totalDiasMes, 1);
 
@@ -159,9 +185,9 @@ function RelatorioPage() {
   const handlePrint = () => window.print();
 
   const handleEmail = () => {
-    const subject = `Relatório de Vendas - ${MONTHS[month - 1]}/${year}`;
+    const subject = `Relatório de Vendas - ${period.label}`;
     const lines = [
-      `Relatório de Vendas - ${MONTHS[month - 1]}/${year}`,
+      `Relatório de Vendas - ${period.label}`,
       ``,
       `Faturamento Total: ${fmtBRL(stats.totals.total)}`,
       `Meta: ${fmtBRL(metaTotal)} (${fmtPct(pctMes)})`,
@@ -213,28 +239,117 @@ function RelatorioPage() {
         <Card className="custom-shadow">
           <CardHeader className="pb-3">
             <CardTitle className="text-base">Período do Relatório</CardTitle>
-            <CardDescription>Filtre o mês para visualizar e exportar.</CardDescription>
+            <CardDescription>
+              Filtre por mês inteiro ou escolha um intervalo personalizado de datas.
+            </CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-wrap gap-3">
-            <Select value={String(month)} onValueChange={(v) => setMonth(Number(v))}>
-              <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {MONTHS.map((m, i) => (
-                  <SelectItem key={i} value={String(i + 1)}>{m}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={String(year)} onValueChange={(v) => setYear(Number(v))}>
-              <SelectTrigger className="w-28"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {Array.from({ length: 5 }).map((_, i) => {
-                  const y = cur.year - 2 + i;
-                  return <SelectItem key={y} value={String(y)}>{y}</SelectItem>;
-                })}
-              </SelectContent>
-            </Select>
+          <CardContent className="space-y-4">
+            <div className="inline-flex rounded-lg border bg-muted/30 p-1 text-xs">
+              <button
+                type="button"
+                onClick={() => setMode("month")}
+                className={cn(
+                  "rounded-md px-3 py-1.5 font-medium transition",
+                  mode === "month" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground",
+                )}
+              >
+                Por mês
+              </button>
+              <button
+                type="button"
+                onClick={() => setMode("range")}
+                className={cn(
+                  "rounded-md px-3 py-1.5 font-medium transition",
+                  mode === "range" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground",
+                )}
+              >
+                Intervalo de datas
+              </button>
+            </div>
+
+            {mode === "month" ? (
+              <div className="flex flex-wrap gap-3">
+                <Select value={String(month)} onValueChange={(v) => setMonth(Number(v))}>
+                  <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {MONTHS.map((m, i) => (
+                      <SelectItem key={i} value={String(i + 1)}>{m}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={String(year)} onValueChange={(v) => setYear(Number(v))}>
+                  <SelectTrigger className="w-28"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {Array.from({ length: 5 }).map((_, i) => {
+                      const y = cur.year - 2 + i;
+                      return <SelectItem key={y} value={String(y)}>{y}</SelectItem>;
+                    })}
+                  </SelectContent>
+                </Select>
+              </div>
+            ) : (
+              <div className="flex flex-wrap items-end gap-3">
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground">De</label>
+                  <input
+                    type="date"
+                    value={dateStart}
+                    max={dateEnd}
+                    onChange={(e) => setDateStart(e.target.value)}
+                    className="block mt-1 h-9 rounded-md border border-input bg-background px-3 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground">Até</label>
+                  <input
+                    type="date"
+                    value={dateEnd}
+                    min={dateStart}
+                    onChange={(e) => setDateEnd(e.target.value)}
+                    className="block mt-1 h-9 rounded-md border border-input bg-background px-3 text-sm"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      const t = new Date();
+                      const start = new Date(t);
+                      start.setDate(t.getDate() - 6);
+                      const iso = (d: Date) =>
+                        `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+                      setDateStart(iso(start));
+                      setDateEnd(iso(t));
+                    }}
+                  >
+                    Últimos 7 dias
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      const t = new Date();
+                      const start = new Date(t);
+                      start.setDate(t.getDate() - 29);
+                      const iso = (d: Date) =>
+                        `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+                      setDateStart(iso(start));
+                      setDateEnd(iso(t));
+                    }}
+                  >
+                    Últimos 30 dias
+                  </Button>
+                </div>
+                <div className="ml-auto text-xs text-muted-foreground">
+                  Período: <span className="font-semibold text-foreground">{period.label}</span> ·{" "}
+                  {period.days} dia(s)
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
+
 
         {/* KPIs */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
 import { Route as AuthForgotRouteImport } from './routes/auth.forgot'
 import { Route as AuthenticatedUsuariosRouteImport } from './routes/_authenticated/usuarios'
+import { Route as AuthenticatedTopProdutosRouteImport } from './routes/_authenticated/top-produtos'
 import { Route as AuthenticatedRhRouteImport } from './routes/_authenticated/rh'
 import { Route as AuthenticatedRelatorioRouteImport } from './routes/_authenticated/relatorio'
 import { Route as AuthenticatedProducaoRouteImport } from './routes/_authenticated/producao'
@@ -56,6 +57,12 @@ const AuthenticatedUsuariosRoute = AuthenticatedUsuariosRouteImport.update({
   path: '/usuarios',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedTopProdutosRoute =
+  AuthenticatedTopProdutosRouteImport.update({
+    id: '/top-produtos',
+    path: '/top-produtos',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedRhRoute = AuthenticatedRhRouteImport.update({
   id: '/rh',
   path: '/rh',
@@ -127,6 +134,7 @@ export interface FileRoutesByFullPath {
   '/producao': typeof AuthenticatedProducaoRoute
   '/relatorio': typeof AuthenticatedRelatorioRoute
   '/rh': typeof AuthenticatedRhRoute
+  '/top-produtos': typeof AuthenticatedTopProdutosRoute
   '/usuarios': typeof AuthenticatedUsuariosRoute
   '/auth/forgot': typeof AuthForgotRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -145,6 +153,7 @@ export interface FileRoutesByTo {
   '/producao': typeof AuthenticatedProducaoRoute
   '/relatorio': typeof AuthenticatedRelatorioRoute
   '/rh': typeof AuthenticatedRhRoute
+  '/top-produtos': typeof AuthenticatedTopProdutosRoute
   '/usuarios': typeof AuthenticatedUsuariosRoute
   '/auth/forgot': typeof AuthForgotRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -165,6 +174,7 @@ export interface FileRoutesById {
   '/_authenticated/producao': typeof AuthenticatedProducaoRoute
   '/_authenticated/relatorio': typeof AuthenticatedRelatorioRoute
   '/_authenticated/rh': typeof AuthenticatedRhRoute
+  '/_authenticated/top-produtos': typeof AuthenticatedTopProdutosRoute
   '/_authenticated/usuarios': typeof AuthenticatedUsuariosRoute
   '/auth/forgot': typeof AuthForgotRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -185,6 +195,7 @@ export interface FileRouteTypes {
     | '/producao'
     | '/relatorio'
     | '/rh'
+    | '/top-produtos'
     | '/usuarios'
     | '/auth/forgot'
     | '/auth/reset-password'
@@ -203,6 +214,7 @@ export interface FileRouteTypes {
     | '/producao'
     | '/relatorio'
     | '/rh'
+    | '/top-produtos'
     | '/usuarios'
     | '/auth/forgot'
     | '/auth/reset-password'
@@ -222,6 +234,7 @@ export interface FileRouteTypes {
     | '/_authenticated/producao'
     | '/_authenticated/relatorio'
     | '/_authenticated/rh'
+    | '/_authenticated/top-produtos'
     | '/_authenticated/usuarios'
     | '/auth/forgot'
     | '/auth/reset-password'
@@ -275,6 +288,13 @@ declare module '@tanstack/react-router' {
       path: '/usuarios'
       fullPath: '/usuarios'
       preLoaderRoute: typeof AuthenticatedUsuariosRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/top-produtos': {
+      id: '/_authenticated/top-produtos'
+      path: '/top-produtos'
+      fullPath: '/top-produtos'
+      preLoaderRoute: typeof AuthenticatedTopProdutosRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/rh': {
@@ -369,6 +389,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedProducaoRoute: typeof AuthenticatedProducaoRoute
   AuthenticatedRelatorioRoute: typeof AuthenticatedRelatorioRoute
   AuthenticatedRhRoute: typeof AuthenticatedRhRoute
+  AuthenticatedTopProdutosRoute: typeof AuthenticatedTopProdutosRoute
   AuthenticatedUsuariosRoute: typeof AuthenticatedUsuariosRoute
 }
 
@@ -384,6 +405,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedProducaoRoute: AuthenticatedProducaoRoute,
   AuthenticatedRelatorioRoute: AuthenticatedRelatorioRoute,
   AuthenticatedRhRoute: AuthenticatedRhRoute,
+  AuthenticatedTopProdutosRoute: AuthenticatedTopProdutosRoute,
   AuthenticatedUsuariosRoute: AuthenticatedUsuariosRoute,
 }
 

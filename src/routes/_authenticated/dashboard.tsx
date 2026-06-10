@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useMe } from "@/hooks/use-me";
 
@@ -47,6 +48,9 @@ import {
   Calendar,
   Store,
   ShoppingBag,
+  CheckCircle2,
+  AlertTriangle,
+  XCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -161,6 +165,44 @@ function DashboardPage() {
 
   const { data: me } = useMe();
 
+  // ----- Alertas de Meta -----
+  const isCurrentMonth = year === cur.year && month === cur.month;
+  const now = new Date();
+  const diaAtual = isCurrentMonth ? now.getDate() : totalDiasMes;
+  const diasRestantes = Math.max(totalDiasMes - diaAtual, 0);
+  const expectedAtual = metaTotal > 0 ? (metaTotal / totalDiasMes) * diaAtual : 0;
+  const pctRitmo = expectedAtual > 0 ? (totalMes / expectedAtual) * 100 : 0;
+  const alertTone: "success" | "warning" | "destructive" | null = metaTotal === 0
+    ? null
+    : pctMes >= 100
+      ? "success"
+      : pctRitmo >= 90
+        ? "warning"
+        : "destructive";
+
+  // Toast ao abrir o sistema (apenas uma vez por sessão por mês)
+  const alertedRef = useRef(false);
+  useEffect(() => {
+    if (!alertTone || alertedRef.current || !isCurrentMonth) return;
+    const sessionKey = `goal-alert-${year}-${month}`;
+    if (sessionStorage.getItem(sessionKey)) return;
+    alertedRef.current = true;
+    sessionStorage.setItem(sessionKey, "1");
+    if (alertTone === "success") {
+      toast.success(`🎉 Meta de ${MONTHS[month - 1]} batida! ${fmtPct(pctMes)} atingido`);
+    } else if (alertTone === "warning") {
+      toast.warning(
+        `Atenção: ${fmtPct(pctMes)} da meta · ${diasRestantes} dia(s) restante(s)`,
+        { description: `Faltam ${fmtBRL(falta)} para atingir a meta` },
+      );
+    } else {
+      toast.error(`Abaixo do ritmo: ${fmtPct(pctRitmo)} do esperado para hoje`, {
+        description: `${diasRestantes} dia(s) restante(s) · Faltam ${fmtBRL(falta)}`,
+      });
+    }
+  }, [alertTone, year, month, pctMes, pctRitmo, falta, diasRestantes, isCurrentMonth]);
+
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
@@ -221,6 +263,56 @@ function DashboardPage() {
           </CardContent>
         </Card>
       )}
+
+      {alertTone && (
+        <Card
+          className={cn(
+            "border-l-4 shadow-sm",
+            alertTone === "success" && "border-l-emerald-500 bg-emerald-50/60",
+            alertTone === "warning" && "border-l-amber-500 bg-amber-50/60",
+            alertTone === "destructive" && "border-l-rose-500 bg-rose-50/60",
+          )}
+        >
+          <CardContent className="flex flex-wrap items-center gap-4 py-4">
+            <div
+              className={cn(
+                "flex h-10 w-10 items-center justify-center rounded-full",
+                alertTone === "success" && "bg-emerald-100 text-emerald-600",
+                alertTone === "warning" && "bg-amber-100 text-amber-600",
+                alertTone === "destructive" && "bg-rose-100 text-rose-600",
+              )}
+            >
+              {alertTone === "success" ? (
+                <CheckCircle2 className="h-5 w-5" />
+              ) : alertTone === "warning" ? (
+                <AlertTriangle className="h-5 w-5" />
+              ) : (
+                <XCircle className="h-5 w-5" />
+              )}
+            </div>
+            <div className="flex-1 min-w-[220px]">
+              <div className="text-sm font-semibold">
+                {alertTone === "success"
+                  ? `Meta de ${MONTHS[month - 1]} batida 🎉`
+                  : alertTone === "warning"
+                    ? `Atenção: próximo da meta`
+                    : `Abaixo do ritmo da meta`}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {fmtPct(pctMes)} da meta · ritmo {fmtPct(pctRitmo)} ·{" "}
+                {isCurrentMonth ? `${diasRestantes} dia(s) restante(s)` : "mês encerrado"} ·{" "}
+                Faltam {fmtBRL(falta)}
+              </div>
+            </div>
+            <Link to="/lancamento">
+              <Button size="sm" variant={alertTone === "destructive" ? "default" : "outline"}>
+                Lançar venda
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      )}
+
 
       {/* Cards principais */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
