@@ -65,6 +65,7 @@ const MODULES = [
   { key: "historico", label: "Histórico" },
   { key: "metas", label: "Metas" },
   { key: "relatorio", label: "Relatórios" },
+  { key: "top_produtos", label: "TOP 10 Produtos" },
   { key: "marketing", label: "Marketing" },
   { key: "comercial", label: "Comercial" },
   { key: "financeiro", label: "Financeiro" },
@@ -83,14 +84,13 @@ const ROLE_LABEL: Record<Role, string> = {
   colaborador: "Usuário",
 };
 
-// Presets de permissões aplicados ao mudar o perfil
 const ROLE_PRESETS: Record<Role, ModuleKey[]> = {
   admin_master: [
-    "dashboard","lancamento","historico","metas","relatorio",
+    "dashboard","lancamento","historico","metas","relatorio","top_produtos",
     "marketing","comercial","financeiro","rh","producao","configuracoes","usuarios",
   ],
-  gestor: ["dashboard","lancamento","historico","metas","relatorio","comercial","marketing"],
-  colaborador: ["dashboard","lancamento","historico"],
+  gestor: ["dashboard","lancamento","historico","metas","relatorio","top_produtos","comercial","marketing"],
+  colaborador: ["dashboard","lancamento","historico","top_produtos"],
 };
 
 
