@@ -583,6 +583,73 @@ function UserFormDialog({
               )}
             </div>
 
+            {!isEdit && (
+              <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Lock className="h-4 w-4 text-primary" />
+                  <p className="text-sm font-semibold">Senha de acesso</p>
+                </div>
+                <div className="flex gap-2 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => setPwMode("manual")}
+                    className={`flex-1 rounded-md border px-3 py-2 font-medium transition ${pwMode === "manual" ? "border-primary bg-primary/10 text-primary" : "bg-card text-muted-foreground hover:bg-muted"}`}
+                  >
+                    Definir agora
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPwMode("auto")}
+                    className={`flex-1 rounded-md border px-3 py-2 font-medium transition ${pwMode === "auto" ? "border-primary bg-primary/10 text-primary" : "bg-card text-muted-foreground hover:bg-muted"}`}
+                  >
+                    Gerar automática + enviar por email
+                  </button>
+                </div>
+                {pwMode === "manual" ? (
+                  <>
+                    <Field label="Senha *">
+                      <div className="flex gap-2">
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          placeholder="Mín. 8 caracteres, 1 maiúscula e 1 número"
+                          required
+                          minLength={8}
+                          autoComplete="new-password"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          onClick={() => setShowPassword((v) => !v)}
+                          title={showPassword ? "Ocultar" : "Mostrar"}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </Field>
+                    <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Checkbox
+                        checked={sendInvite}
+                        onCheckedChange={(c) => setSendInvite(c === true)}
+                      />
+                      <span className="flex items-center gap-1.5">
+                        <Mail className="h-3.5 w-3.5" /> Também enviar e-mail de boas-vindas para o
+                        usuário
+                      </span>
+                    </label>
+                  </>
+                ) : (
+                  <p className="text-xs text-muted-foreground">
+                    Uma senha temporária será gerada e o sistema enviará um convite por e-mail para
+                    o usuário definir a própria senha.
+                  </p>
+                )}
+              </div>
+            )}
+
+
             <div className="rounded-lg border bg-muted/30 p-4">
               <div className="mb-3 flex items-center gap-2">
                 <ShieldCheck className="h-4 w-4 text-primary" />
