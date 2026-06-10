@@ -131,7 +131,7 @@ function RelatorioPage() {
   const metaLoja = Number(goal?.meta_loja ?? 0);
   const metaML = Number(goal?.meta_mercado_livre ?? 0);
   const diasUteis = Number(goal?.dias_uteis ?? 22);
-  const totalDiasMes = daysInMonth(year, month);
+  const totalDiasMes = period.days;
   const metaTotal = metaLoja + metaML;
   const metaDiaTotal = metaLoja / Math.max(diasUteis, 1) + metaML / Math.max(totalDiasMes, 1);
 
