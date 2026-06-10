@@ -447,16 +447,26 @@ function UserFormDialog({
           <DialogTitle>{isEdit ? "Editar usuário" : "Novo usuário"}</DialogTitle>
         </DialogHeader>
 
-        {tempPw ? (
+        {tempPw !== null || pwSetByAdmin ? (
           <div className="space-y-4">
             <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm">
               <p className="font-semibold text-emerald-900">Usuário criado com sucesso.</p>
               <p className="mt-1 text-emerald-800">
-                {emailSent ? (
+                {pwSetByAdmin && !emailSent && (
+                  <>A senha definida já está ativa. Repasse ao usuário em segurança.</>
+                )}
+                {pwSetByAdmin && emailSent && (
+                  <>
+                    A senha definida está ativa e um e-mail de boas-vindas foi enviado para{" "}
+                    <strong>{form.email}</strong>.
+                  </>
+                )}
+                {!pwSetByAdmin && emailSent && (
                   <>
                     Um convite foi enviado para <strong>{form.email}</strong> definir a senha.
                   </>
-                ) : (
+                )}
+                {!pwSetByAdmin && !emailSent && (
                   <>
                     Não foi possível enviar o email automaticamente. Repasse a senha temporária
                     manualmente.
@@ -464,23 +474,27 @@ function UserFormDialog({
                 )}
               </p>
             </div>
-            <div>
-              <Label>Senha temporária</Label>
-              <div className="mt-1 flex gap-2">
-                <Input readOnly value={tempPw} className="font-mono" />
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    navigator.clipboard.writeText(tempPw);
-                    toast.success("Copiado");
-                  }}
-                >
-                  <Copy className="h-4 w-4" />
-                </Button>
+            {tempPw && (
+              <div>
+                <Label>{pwSetByAdmin ? "Senha definida" : "Senha temporária"}</Label>
+                <div className="mt-1 flex gap-2">
+                  <Input readOnly value={tempPw} className="font-mono" />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      navigator.clipboard.writeText(tempPw);
+                      toast.success("Copiado");
+                    }}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Guarde — só será exibida agora.
+                </p>
               </div>
-              <p className="mt-1 text-xs text-muted-foreground">Guarde — só será exibida agora.</p>
-            </div>
+            )}
             <DialogFooter>
               <Button onClick={onClose}>Fechar</Button>
             </DialogFooter>
