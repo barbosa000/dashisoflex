@@ -95,7 +95,7 @@ const createSchema = z.object({
     .regex(/[0-9]/, "Inclua ao menos um número")
     .optional()
     .nullable(),
-  send_invite: z.boolean().optional().default(false),
+  send_invite: z.boolean().optional(),
 });
 
 export const createUser = createServerFn({ method: "POST" })
