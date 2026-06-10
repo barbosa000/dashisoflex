@@ -276,6 +276,7 @@ export type Database = {
         | "producao"
         | "configuracoes"
         | "usuarios"
+        | "top_produtos"
       app_role: "admin_master" | "gestor" | "colaborador"
       user_status: "ativo" | "inativo" | "bloqueado"
     }
@@ -418,6 +419,7 @@ export const Constants = {
         "producao",
         "configuracoes",
         "usuarios",
+        "top_produtos",
       ],
       app_role: ["admin_master", "gestor", "colaborador"],
       user_status: ["ativo", "inativo", "bloqueado"],
