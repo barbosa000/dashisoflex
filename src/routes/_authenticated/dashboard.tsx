@@ -168,7 +168,7 @@ function DashboardPage() {
   // ----- Alertas de Meta -----
   const isCurrentMonth = year === cur.year && month === cur.month;
   const now = new Date();
-  const diaAtual = isCurrentMonth ? today.getDate() : totalDiasMes;
+  const diaAtual = isCurrentMonth ? now.getDate() : totalDiasMes;
   const diasRestantes = Math.max(totalDiasMes - diaAtual, 0);
   const expectedAtual = metaTotal > 0 ? (metaTotal / totalDiasMes) * diaAtual : 0;
   const pctRitmo = expectedAtual > 0 ? (totalMes / expectedAtual) * 100 : 0;
