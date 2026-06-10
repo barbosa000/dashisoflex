@@ -366,8 +366,13 @@ function UserFormDialog({
   const [perms, setPerms] = useState<Set<ModuleKey>>(
     new Set((user?.permissions as ModuleKey[]) ?? ["dashboard"]),
   );
+  const [pwMode, setPwMode] = useState<"manual" | "auto">("manual");
+  const [password, setPassword] = useState("");
+  const [sendInvite, setSendInvite] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [tempPw, setTempPw] = useState<string | null>(null);
   const [emailSent, setEmailSent] = useState(false);
+  const [pwSetByAdmin, setPwSetByAdmin] = useState(false);
 
   const create = useServerFn(createUser);
   const update = useServerFn(updateUser);
@@ -398,15 +403,22 @@ function UserFormDialog({
           setor: form.setor || null,
           role: form.role,
           permissions,
+          password: pwMode === "manual" ? password : null,
+          send_invite: pwMode === "manual" ? sendInvite : true,
         },
       });
     },
     onSuccess: (res) => {
-      if (!isEdit && res && "tempPassword" in res) {
-        setTempPw(res.tempPassword);
-        setEmailSent(res.emailSent);
+      if (!isEdit && res && "passwordSetByAdmin" in res) {
+        setPwSetByAdmin(!!res.passwordSetByAdmin);
+        setEmailSent(!!res.emailSent);
+        setTempPw(res.tempPassword ?? (pwMode === "manual" ? password : null));
         toast.success(
-          res.emailSent ? "Usuário criado — convite enviado por email" : "Usuário criado",
+          res.passwordSetByAdmin
+            ? "Usuário criado com a senha definida"
+            : res.emailSent
+              ? "Usuário criado — convite enviado por email"
+              : "Usuário criado",
         );
       } else {
         toast.success("Alterações salvas");
