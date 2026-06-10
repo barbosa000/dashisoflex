@@ -264,6 +264,56 @@ function DashboardPage() {
         </Card>
       )}
 
+      {alertTone && (
+        <Card
+          className={cn(
+            "border-l-4 shadow-sm",
+            alertTone === "success" && "border-l-emerald-500 bg-emerald-50/60",
+            alertTone === "warning" && "border-l-amber-500 bg-amber-50/60",
+            alertTone === "destructive" && "border-l-rose-500 bg-rose-50/60",
+          )}
+        >
+          <CardContent className="flex flex-wrap items-center gap-4 py-4">
+            <div
+              className={cn(
+                "flex h-10 w-10 items-center justify-center rounded-full",
+                alertTone === "success" && "bg-emerald-100 text-emerald-600",
+                alertTone === "warning" && "bg-amber-100 text-amber-600",
+                alertTone === "destructive" && "bg-rose-100 text-rose-600",
+              )}
+            >
+              {alertTone === "success" ? (
+                <CheckCircle2 className="h-5 w-5" />
+              ) : alertTone === "warning" ? (
+                <AlertTriangle className="h-5 w-5" />
+              ) : (
+                <XCircle className="h-5 w-5" />
+              )}
+            </div>
+            <div className="flex-1 min-w-[220px]">
+              <div className="text-sm font-semibold">
+                {alertTone === "success"
+                  ? `Meta de ${MONTHS[month - 1]} batida 🎉`
+                  : alertTone === "warning"
+                    ? `Atenção: próximo da meta`
+                    : `Abaixo do ritmo da meta`}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {fmtPct(pctMes)} da meta · ritmo {fmtPct(pctRitmo)} ·{" "}
+                {isCurrentMonth ? `${diasRestantes} dia(s) restante(s)` : "mês encerrado"} ·{" "}
+                Faltam {fmtBRL(falta)}
+              </div>
+            </div>
+            <Link to="/lancamento">
+              <Button size="sm" variant={alertTone === "destructive" ? "default" : "outline"}>
+                Lançar venda
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      )}
+
+
       {/* Cards principais */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <KpiCard
