@@ -185,9 +185,9 @@ function RelatorioPage() {
   const handlePrint = () => window.print();
 
   const handleEmail = () => {
-    const subject = `Relatório de Vendas - ${MONTHS[month - 1]}/${year}`;
+    const subject = `Relatório de Vendas - ${period.label}`;
     const lines = [
-      `Relatório de Vendas - ${MONTHS[month - 1]}/${year}`,
+      `Relatório de Vendas - ${period.label}`,
       ``,
       `Faturamento Total: ${fmtBRL(stats.totals.total)}`,
       `Meta: ${fmtBRL(metaTotal)} (${fmtPct(pctMes)})`,
