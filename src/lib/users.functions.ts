@@ -15,6 +15,7 @@ const APP_MODULES = [
   "producao",
   "configuracoes",
   "usuarios",
+  "top_produtos",
 ] as const;
 const ROLES = ["admin_master", "gestor", "colaborador"] as const;
 
