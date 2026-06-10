@@ -165,6 +165,44 @@ function DashboardPage() {
 
   const { data: me } = useMe();
 
+  // ----- Alertas de Meta -----
+  const isCurrentMonth = year === cur.year && month === cur.month;
+  const today = new Date();
+  const diaAtual = isCurrentMonth ? today.getDate() : totalDiasMes;
+  const diasRestantes = Math.max(totalDiasMes - diaAtual, 0);
+  const expectedAtual = metaTotal > 0 ? (metaTotal / totalDiasMes) * diaAtual : 0;
+  const pctRitmo = expectedAtual > 0 ? (totalMes / expectedAtual) * 100 : 0;
+  const alertTone: "success" | "warning" | "destructive" | null = metaTotal === 0
+    ? null
+    : pctMes >= 100
+      ? "success"
+      : pctRitmo >= 90
+        ? "warning"
+        : "destructive";
+
+  // Toast ao abrir o sistema (apenas uma vez por sessão por mês)
+  const alertedRef = useRef(false);
+  useEffect(() => {
+    if (!alertTone || alertedRef.current || !isCurrentMonth) return;
+    const sessionKey = `goal-alert-${year}-${month}`;
+    if (sessionStorage.getItem(sessionKey)) return;
+    alertedRef.current = true;
+    sessionStorage.setItem(sessionKey, "1");
+    if (alertTone === "success") {
+      toast.success(`🎉 Meta de ${MONTHS[month - 1]} batida! ${fmtPct(pctMes)} atingido`);
+    } else if (alertTone === "warning") {
+      toast.warning(
+        `Atenção: ${fmtPct(pctMes)} da meta · ${diasRestantes} dia(s) restante(s)`,
+        { description: `Faltam ${fmtBRL(falta)} para atingir a meta` },
+      );
+    } else {
+      toast.error(`Abaixo do ritmo: ${fmtPct(pctRitmo)} do esperado para hoje`, {
+        description: `${diasRestantes} dia(s) restante(s) · Faltam ${fmtBRL(falta)}`,
+      });
+    }
+  }, [alertTone, year, month, pctMes, pctRitmo, falta, diasRestantes, isCurrentMonth]);
+
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
