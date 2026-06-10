@@ -87,6 +87,15 @@ const createSchema = z.object({
   setor: z.string().trim().max(100).optional().nullable(),
   role: z.enum(ROLES),
   permissions: z.array(z.enum(APP_MODULES)).default([]),
+  password: z
+    .string()
+    .min(8, "A senha deve ter pelo menos 8 caracteres")
+    .max(72)
+    .regex(/[A-Z]/, "Inclua ao menos uma letra maiúscula")
+    .regex(/[0-9]/, "Inclua ao menos um número")
+    .optional()
+    .nullable(),
+  send_invite: z.boolean().optional().default(false),
 });
 
 export const createUser = createServerFn({ method: "POST" })
@@ -96,19 +105,22 @@ export const createUser = createServerFn({ method: "POST" })
     await ensureAdmin(context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    // Gera senha temporária + cria usuário já confirmado e envia convite por email
-    const tempPassword = `Iso-${Math.random().toString(36).slice(2, 10)}${Math.floor(Math.random() * 100)}!`;
+    // Senha: usa a fornecida pelo admin, senão gera uma temporária
+    const customPassword = data.password?.trim() || "";
+    const passwordIsCustom = customPassword.length >= 8;
+    const password = passwordIsCustom
+      ? customPassword
+      : `Iso-${Math.random().toString(36).slice(2, 10)}${Math.floor(Math.random() * 100)}!`;
     const origin = process.env.SITE_URL || "";
     const { data: created, error: cErr } = await supabaseAdmin.auth.admin.createUser({
       email: data.email,
-      password: tempPassword,
+      password,
       email_confirm: true,
       user_metadata: { full_name: data.full_name },
     });
     if (cErr || !created.user) throw new Error(cErr?.message ?? "Falha ao criar usuário");
 
     const uid = created.user.id;
-    // Trigger handle_new_user já criou profile + role colaborador + perm dashboard. Ajustamos.
     await supabaseAdmin
       .from("profiles")
       .update({
@@ -119,7 +131,6 @@ export const createUser = createServerFn({ method: "POST" })
       })
       .eq("id", uid);
 
-    // Substitui roles e permissões pelas escolhidas
     await supabaseAdmin.from("user_roles").delete().eq("user_id", uid);
     await supabaseAdmin.from("user_roles").insert({ user_id: uid, role: data.role });
 
@@ -134,15 +145,17 @@ export const createUser = createServerFn({ method: "POST" })
         .insert(data.permissions.map((m) => ({ user_id: uid, module: m })));
     }
 
-    // Envia convite (link para definir nova senha) - usa Supabase Auth email
+    // Envia convite (link para definir nova senha) apenas se solicitado ou se senha foi gerada
     let emailSent = false;
-    try {
-      await supabaseAdmin.auth.admin.inviteUserByEmail(data.email, {
-        redirectTo: origin ? `${origin}/auth` : undefined,
-      });
-      emailSent = true;
-    } catch {
-      // ignore — fallback: retornamos a senha temporária
+    if (data.send_invite || !passwordIsCustom) {
+      try {
+        await supabaseAdmin.auth.admin.inviteUserByEmail(data.email, {
+          redirectTo: origin ? `${origin}/auth` : undefined,
+        });
+        emailSent = true;
+      } catch {
+        // ignore
+      }
     }
 
     await logAudit(
@@ -151,10 +164,15 @@ export const createUser = createServerFn({ method: "POST" })
       "user.create",
       "profiles",
       uid,
-      { email: data.email, role: data.role },
+      { email: data.email, role: data.role, password_set_by_admin: passwordIsCustom },
     );
 
-    return { id: uid, tempPassword, emailSent };
+    return {
+      id: uid,
+      tempPassword: passwordIsCustom ? null : password,
+      passwordSetByAdmin: passwordIsCustom,
+      emailSent,
+    };
   });
 
 // -------- UPDATE USER --------
