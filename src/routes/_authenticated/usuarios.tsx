@@ -69,8 +69,7 @@ const MODULES = [
   { key: "marketing", label: "Marketing" },
   { key: "comercial", label: "Comercial" },
   { key: "financeiro", label: "Financeiro" },
-  { key: "rh", label: "RH" },
-  { key: "producao", label: "Produção" },
+  { key: "engenharia", label: "Engenharia" },
   { key: "configuracoes", label: "Configurações" },
   { key: "usuarios", label: "Usuários" },
 ] as const;
@@ -87,7 +86,7 @@ const ROLE_LABEL: Record<Role, string> = {
 const ROLE_PRESETS: Record<Role, ModuleKey[]> = {
   admin_master: [
     "dashboard","lancamento","historico","metas","relatorio","top_produtos",
-    "marketing","comercial","financeiro","rh","producao","configuracoes","usuarios",
+    "marketing","comercial","financeiro","engenharia","configuracoes","usuarios",
   ],
   gestor: ["dashboard","lancamento","historico","metas","relatorio","top_produtos","comercial","marketing"],
   colaborador: ["dashboard","lancamento","historico","top_produtos"],
