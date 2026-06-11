@@ -20,9 +20,8 @@ import {
   Megaphone,
   Briefcase,
   DollarSign,
-  Users as UsersIcon,
   Cog,
-  Factory,
+  Wrench,
   ShieldCheck,
   Trophy,
 } from "lucide-react";
@@ -50,8 +49,7 @@ const allNav: { to: string; label: string; icon: typeof LayoutDashboard; mod: Ap
   { to: "/marketing", label: "Marketing", icon: Megaphone, mod: "marketing" },
   { to: "/comercial", label: "Comercial", icon: Briefcase, mod: "comercial" },
   { to: "/financeiro", label: "Financeiro", icon: DollarSign, mod: "financeiro" },
-  { to: "/rh", label: "RH", icon: UsersIcon, mod: "rh" },
-  { to: "/producao", label: "Produção", icon: Factory, mod: "producao" },
+  { to: "/engenharia", label: "Engenharia", icon: Wrench, mod: "engenharia" },
   { to: "/configuracoes", label: "Configurações", icon: Cog, mod: "configuracoes" },
   { to: "/usuarios", label: "Usuários", icon: ShieldCheck, mod: "usuarios" },
 ];

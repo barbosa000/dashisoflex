@@ -16,14 +16,13 @@ import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-passw
 import { Route as AuthForgotRouteImport } from './routes/auth.forgot'
 import { Route as AuthenticatedUsuariosRouteImport } from './routes/_authenticated/usuarios'
 import { Route as AuthenticatedTopProdutosRouteImport } from './routes/_authenticated/top-produtos'
-import { Route as AuthenticatedRhRouteImport } from './routes/_authenticated/rh'
 import { Route as AuthenticatedRelatorioRouteImport } from './routes/_authenticated/relatorio'
-import { Route as AuthenticatedProducaoRouteImport } from './routes/_authenticated/producao'
 import { Route as AuthenticatedMetasRouteImport } from './routes/_authenticated/metas'
 import { Route as AuthenticatedMarketingRouteImport } from './routes/_authenticated/marketing'
 import { Route as AuthenticatedLancamentoRouteImport } from './routes/_authenticated/lancamento'
 import { Route as AuthenticatedHistoricoRouteImport } from './routes/_authenticated/historico'
 import { Route as AuthenticatedFinanceiroRouteImport } from './routes/_authenticated/financeiro'
+import { Route as AuthenticatedEngenhariaRouteImport } from './routes/_authenticated/engenharia'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authenticated/configuracoes'
 import { Route as AuthenticatedComercialRouteImport } from './routes/_authenticated/comercial'
@@ -63,19 +62,9 @@ const AuthenticatedTopProdutosRoute =
     path: '/top-produtos',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedRhRoute = AuthenticatedRhRouteImport.update({
-  id: '/rh',
-  path: '/rh',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 const AuthenticatedRelatorioRoute = AuthenticatedRelatorioRouteImport.update({
   id: '/relatorio',
   path: '/relatorio',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedProducaoRoute = AuthenticatedProducaoRouteImport.update({
-  id: '/producao',
-  path: '/producao',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedMetasRoute = AuthenticatedMetasRouteImport.update({
@@ -103,6 +92,11 @@ const AuthenticatedFinanceiroRoute = AuthenticatedFinanceiroRouteImport.update({
   path: '/financeiro',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedEngenhariaRoute = AuthenticatedEngenhariaRouteImport.update({
+  id: '/engenharia',
+  path: '/engenharia',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -126,14 +120,13 @@ export interface FileRoutesByFullPath {
   '/comercial': typeof AuthenticatedComercialRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/engenharia': typeof AuthenticatedEngenhariaRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
   '/historico': typeof AuthenticatedHistoricoRoute
   '/lancamento': typeof AuthenticatedLancamentoRoute
   '/marketing': typeof AuthenticatedMarketingRoute
   '/metas': typeof AuthenticatedMetasRoute
-  '/producao': typeof AuthenticatedProducaoRoute
   '/relatorio': typeof AuthenticatedRelatorioRoute
-  '/rh': typeof AuthenticatedRhRoute
   '/top-produtos': typeof AuthenticatedTopProdutosRoute
   '/usuarios': typeof AuthenticatedUsuariosRoute
   '/auth/forgot': typeof AuthForgotRoute
@@ -145,14 +138,13 @@ export interface FileRoutesByTo {
   '/comercial': typeof AuthenticatedComercialRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/engenharia': typeof AuthenticatedEngenhariaRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
   '/historico': typeof AuthenticatedHistoricoRoute
   '/lancamento': typeof AuthenticatedLancamentoRoute
   '/marketing': typeof AuthenticatedMarketingRoute
   '/metas': typeof AuthenticatedMetasRoute
-  '/producao': typeof AuthenticatedProducaoRoute
   '/relatorio': typeof AuthenticatedRelatorioRoute
-  '/rh': typeof AuthenticatedRhRoute
   '/top-produtos': typeof AuthenticatedTopProdutosRoute
   '/usuarios': typeof AuthenticatedUsuariosRoute
   '/auth/forgot': typeof AuthForgotRoute
@@ -166,14 +158,13 @@ export interface FileRoutesById {
   '/_authenticated/comercial': typeof AuthenticatedComercialRoute
   '/_authenticated/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/engenharia': typeof AuthenticatedEngenhariaRoute
   '/_authenticated/financeiro': typeof AuthenticatedFinanceiroRoute
   '/_authenticated/historico': typeof AuthenticatedHistoricoRoute
   '/_authenticated/lancamento': typeof AuthenticatedLancamentoRoute
   '/_authenticated/marketing': typeof AuthenticatedMarketingRoute
   '/_authenticated/metas': typeof AuthenticatedMetasRoute
-  '/_authenticated/producao': typeof AuthenticatedProducaoRoute
   '/_authenticated/relatorio': typeof AuthenticatedRelatorioRoute
-  '/_authenticated/rh': typeof AuthenticatedRhRoute
   '/_authenticated/top-produtos': typeof AuthenticatedTopProdutosRoute
   '/_authenticated/usuarios': typeof AuthenticatedUsuariosRoute
   '/auth/forgot': typeof AuthForgotRoute
@@ -187,14 +178,13 @@ export interface FileRouteTypes {
     | '/comercial'
     | '/configuracoes'
     | '/dashboard'
+    | '/engenharia'
     | '/financeiro'
     | '/historico'
     | '/lancamento'
     | '/marketing'
     | '/metas'
-    | '/producao'
     | '/relatorio'
-    | '/rh'
     | '/top-produtos'
     | '/usuarios'
     | '/auth/forgot'
@@ -206,14 +196,13 @@ export interface FileRouteTypes {
     | '/comercial'
     | '/configuracoes'
     | '/dashboard'
+    | '/engenharia'
     | '/financeiro'
     | '/historico'
     | '/lancamento'
     | '/marketing'
     | '/metas'
-    | '/producao'
     | '/relatorio'
-    | '/rh'
     | '/top-produtos'
     | '/usuarios'
     | '/auth/forgot'
@@ -226,14 +215,13 @@ export interface FileRouteTypes {
     | '/_authenticated/comercial'
     | '/_authenticated/configuracoes'
     | '/_authenticated/dashboard'
+    | '/_authenticated/engenharia'
     | '/_authenticated/financeiro'
     | '/_authenticated/historico'
     | '/_authenticated/lancamento'
     | '/_authenticated/marketing'
     | '/_authenticated/metas'
-    | '/_authenticated/producao'
     | '/_authenticated/relatorio'
-    | '/_authenticated/rh'
     | '/_authenticated/top-produtos'
     | '/_authenticated/usuarios'
     | '/auth/forgot'
@@ -297,25 +285,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTopProdutosRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/rh': {
-      id: '/_authenticated/rh'
-      path: '/rh'
-      fullPath: '/rh'
-      preLoaderRoute: typeof AuthenticatedRhRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/relatorio': {
       id: '/_authenticated/relatorio'
       path: '/relatorio'
       fullPath: '/relatorio'
       preLoaderRoute: typeof AuthenticatedRelatorioRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/producao': {
-      id: '/_authenticated/producao'
-      path: '/producao'
-      fullPath: '/producao'
-      preLoaderRoute: typeof AuthenticatedProducaoRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/metas': {
@@ -353,6 +327,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFinanceiroRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/engenharia': {
+      id: '/_authenticated/engenharia'
+      path: '/engenharia'
+      fullPath: '/engenharia'
+      preLoaderRoute: typeof AuthenticatedEngenhariaRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -381,14 +362,13 @@ interface AuthenticatedRouteChildren {
   AuthenticatedComercialRoute: typeof AuthenticatedComercialRoute
   AuthenticatedConfiguracoesRoute: typeof AuthenticatedConfiguracoesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedEngenhariaRoute: typeof AuthenticatedEngenhariaRoute
   AuthenticatedFinanceiroRoute: typeof AuthenticatedFinanceiroRoute
   AuthenticatedHistoricoRoute: typeof AuthenticatedHistoricoRoute
   AuthenticatedLancamentoRoute: typeof AuthenticatedLancamentoRoute
   AuthenticatedMarketingRoute: typeof AuthenticatedMarketingRoute
   AuthenticatedMetasRoute: typeof AuthenticatedMetasRoute
-  AuthenticatedProducaoRoute: typeof AuthenticatedProducaoRoute
   AuthenticatedRelatorioRoute: typeof AuthenticatedRelatorioRoute
-  AuthenticatedRhRoute: typeof AuthenticatedRhRoute
   AuthenticatedTopProdutosRoute: typeof AuthenticatedTopProdutosRoute
   AuthenticatedUsuariosRoute: typeof AuthenticatedUsuariosRoute
 }
@@ -397,14 +377,13 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedComercialRoute: AuthenticatedComercialRoute,
   AuthenticatedConfiguracoesRoute: AuthenticatedConfiguracoesRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedEngenhariaRoute: AuthenticatedEngenhariaRoute,
   AuthenticatedFinanceiroRoute: AuthenticatedFinanceiroRoute,
   AuthenticatedHistoricoRoute: AuthenticatedHistoricoRoute,
   AuthenticatedLancamentoRoute: AuthenticatedLancamentoRoute,
   AuthenticatedMarketingRoute: AuthenticatedMarketingRoute,
   AuthenticatedMetasRoute: AuthenticatedMetasRoute,
-  AuthenticatedProducaoRoute: AuthenticatedProducaoRoute,
   AuthenticatedRelatorioRoute: AuthenticatedRelatorioRoute,
-  AuthenticatedRhRoute: AuthenticatedRhRoute,
   AuthenticatedTopProdutosRoute: AuthenticatedTopProdutosRoute,
   AuthenticatedUsuariosRoute: AuthenticatedUsuariosRoute,
 }
