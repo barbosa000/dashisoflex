@@ -315,7 +315,7 @@ function DashboardPage() {
 
 
       {/* Cards principais */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <KpiCard
           title="Faturado no mês"
           value={fmtBRL(totalMes)}
@@ -336,12 +336,20 @@ function DashboardPage() {
           subtitle={pctMes >= 100 ? "Meta batida!" : `Faltam ${fmtPct(100 - pctMes)}`}
         />
         <KpiCard
-          title="Falta para meta"
-          value={fmtBRL(falta)}
-          icon={Target}
-          subtitle={falta === 0 ? "Meta atingida" : "Para atingir o mês"}
+          title="% Dias decorridos"
+          value={fmtPct((diaAtual / totalDiasMes) * 100)}
+          icon={Calendar}
+          subtitle={`${diaAtual} de ${totalDiasMes} dias${isCurrentMonth ? ` · ${diasRestantes} restantes` : " · encerrado"}`}
+        />
+        <KpiCard
+          title="Atingido vs Decorrido"
+          value={`${(pctMes - (diaAtual / totalDiasMes) * 100 >= 0 ? "+" : "")}${fmtPct(pctMes - (diaAtual / totalDiasMes) * 100)}`}
+          icon={pctMes >= (diaAtual / totalDiasMes) * 100 ? ArrowUpRight : ArrowDownRight}
+          tone={pctMes >= (diaAtual / totalDiasMes) * 100 ? "success" : pctRitmo >= 90 ? "warning" : "destructive"}
+          subtitle={`Ritmo: ${fmtPct(pctRitmo)} do esperado`}
         />
       </div>
+
 
       {/* % por canal */}
       <div className="grid gap-4 md:grid-cols-2">
