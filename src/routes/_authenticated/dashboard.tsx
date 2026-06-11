@@ -149,10 +149,38 @@ function DashboardPage() {
   const totalMes = acumulado.at(-1)?.acumTotal ?? 0;
   const totalLojaMes = acumulado.at(-1)?.acumLoja ?? 0;
   const totalMLMes = acumulado.at(-1)?.acumML ?? 0;
+
+  // Porcentagem absoluta do mês (usada na barra de progresso)
   const pctMes = metaTotal > 0 ? (totalMes / metaTotal) * 100 : 0;
   const pctLoja = metaLoja > 0 ? (totalLojaMes / metaLoja) * 100 : 0;
   const pctML = metaML > 0 ? (totalMLMes / metaML) * 100 : 0;
   const falta = Math.max(metaTotal - totalMes, 0);
+
+  // Alertas de Meta
+  const isCurrentMonth = year === cur.year && month === cur.month;
+  const now = new Date();
+  const diaAtual = isCurrentMonth ? now.getDate() : totalDiasMes;
+  const diasRestantes = Math.max(totalDiasMes - diaAtual, 0);
+  const expectedAtual = metaTotal > 0 ? (metaTotal / totalDiasMes) * diaAtual : 0;
+  const pctRitmo = expectedAtual > 0 ? (totalMes / expectedAtual) * 100 : 0;
+
+  // Ritmo por canal: compara realizado com o esperado proporcional aos dias decorridos
+  // Loja Virtual usa dias úteis como base; limita diaAtual ao máximo de diasUteis
+  const expectedLoja =
+    metaLoja > 0 ? (metaLoja / Math.max(diasUteis, 1)) * Math.min(diaAtual, diasUteis) : 0;
+  // Mercado Livre usa dias totais do mês
+  const expectedML = metaML > 0 ? (metaML / totalDiasMes) * diaAtual : 0;
+  const ritmoLoja = expectedLoja > 0 ? (totalLojaMes / expectedLoja) * 100 : 0;
+  const ritmoML = expectedML > 0 ? (totalMLMes / expectedML) * 100 : 0;
+
+  const alertTone: "success" | "warning" | "destructive" | null =
+    metaTotal === 0
+      ? null
+      : pctMes >= 100
+        ? "success"
+        : pctRitmo >= 90
+          ? "warning"
+          : "destructive";
 
   // Lançamento do dia selecionado
   const dia = sales.find((s) => s.sale_date === selectedDay);
@@ -164,21 +192,6 @@ function DashboardPage() {
   const pctDiaML = metaDiaML > 0 ? (diaML / metaDiaML) * 100 : 0;
 
   const { data: me } = useMe();
-
-  // ----- Alertas de Meta -----
-  const isCurrentMonth = year === cur.year && month === cur.month;
-  const now = new Date();
-  const diaAtual = isCurrentMonth ? now.getDate() : totalDiasMes;
-  const diasRestantes = Math.max(totalDiasMes - diaAtual, 0);
-  const expectedAtual = metaTotal > 0 ? (metaTotal / totalDiasMes) * diaAtual : 0;
-  const pctRitmo = expectedAtual > 0 ? (totalMes / expectedAtual) * 100 : 0;
-  const alertTone: "success" | "warning" | "destructive" | null = metaTotal === 0
-    ? null
-    : pctMes >= 100
-      ? "success"
-      : pctRitmo >= 90
-        ? "warning"
-        : "destructive";
 
   // Toast ao abrir o sistema (apenas uma vez por sessão por mês)
   const alertedRef = useRef(false);
@@ -201,7 +214,6 @@ function DashboardPage() {
       });
     }
   }, [alertTone, year, month, pctMes, pctRitmo, falta, diasRestantes, isCurrentMonth]);
-
 
   return (
     <div className="space-y-6">
@@ -313,7 +325,6 @@ function DashboardPage() {
         </Card>
       )}
 
-
       {/* Cards principais */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <KpiCard
@@ -345,11 +356,16 @@ function DashboardPage() {
           title="Atingido vs Decorrido"
           value={`${(pctMes - (diaAtual / totalDiasMes) * 100 >= 0 ? "+" : "")}${fmtPct(pctMes - (diaAtual / totalDiasMes) * 100)}`}
           icon={pctMes >= (diaAtual / totalDiasMes) * 100 ? ArrowUpRight : ArrowDownRight}
-          tone={pctMes >= (diaAtual / totalDiasMes) * 100 ? "success" : pctRitmo >= 90 ? "warning" : "destructive"}
+          tone={
+            pctMes >= (diaAtual / totalDiasMes) * 100
+              ? "success"
+              : pctRitmo >= 90
+                ? "warning"
+                : "destructive"
+          }
           subtitle={`Ritmo: ${fmtPct(pctRitmo)} do esperado`}
         />
       </div>
-
 
       {/* % por canal */}
       <div className="grid gap-4 md:grid-cols-2">
@@ -359,6 +375,7 @@ function DashboardPage() {
           realizado={totalLojaMes}
           meta={metaLoja}
           pct={pctLoja}
+          ritmo={ritmoLoja}
           subtitle={`Meta diária (${diasUteis} dias úteis): ${fmtBRL(metaDiaLoja)}`}
         />
         <ChannelProgress
@@ -367,6 +384,7 @@ function DashboardPage() {
           realizado={totalMLMes}
           meta={metaML}
           pct={pctML}
+          ritmo={ritmoML}
           subtitle={`Meta diária (${totalDiasMes} dias totais): ${fmtBRL(metaDiaML)}`}
         />
       </div>
@@ -450,7 +468,12 @@ function DashboardPage() {
                   y={metaDiaLoja + metaDiaML}
                   stroke="#0f52ba"
                   strokeDasharray="4 4"
-                  label={{ value: "Meta diária", position: "insideTopRight", fontSize: 10, fill: "#0f52ba" }}
+                  label={{
+                    value: "Meta diária",
+                    position: "insideTopRight",
+                    fontSize: 10,
+                    fill: "#0f52ba",
+                  }}
                 />
                 <Bar dataKey="diario" name="Total dia" radius={[6, 6, 0, 0]}>
                   {acumulado.map((d, i) => {
@@ -524,7 +547,6 @@ function DashboardPage() {
                   strokeDasharray="5 5"
                   dot={false}
                 />
-
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
@@ -586,13 +608,15 @@ function ChannelProgress({
   realizado,
   meta,
   pct,
+  ritmo,
   subtitle,
 }: {
   icon: React.ComponentType<{ className?: string }>;
   title: string;
   realizado: number;
   meta: number;
-  pct: number;
+  pct: number;       // % absoluta do mês → usada na barra de progresso
+  ritmo: number;     // % vs esperado até hoje → usada no badge
   subtitle: string;
 }) {
   const tone = statusColor(pct);
@@ -605,7 +629,8 @@ function ChannelProgress({
           <CardTitle className="flex items-center gap-2 text-base font-semibold text-foreground">
             <Icon className="h-4.5 w-4.5 text-primary" /> {title}
           </CardTitle>
-          <StatusBadge pct={pct} />
+          {/* Badge usa ritmo (realizado vs esperado até hoje), não a % absoluta */}
+          <StatusBadge pct={ritmo} />
         </div>
         <CardDescription className="text-xs text-muted-foreground/80">{subtitle}</CardDescription>
       </CardHeader>
