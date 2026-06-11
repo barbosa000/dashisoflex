@@ -476,7 +476,16 @@ function DashboardPage() {
           </CardHeader>
           <CardContent className="h-72">
             <ResponsiveContainer>
-              <LineChart data={acumulado.map((a) => ({ ...a, meta: metaTotal }))}>
+              <LineChart
+                data={acumulado.map((a) => {
+                  const dayNum = parseISODate(a.rawDate).getDate();
+                  return {
+                    ...a,
+                    meta: metaTotal,
+                    esperado: (metaTotal / totalDiasMes) * dayNum,
+                  };
+                })}
+              >
                 <CartesianGrid strokeDasharray="3 3" className="stroke-slate-100" />
                 <XAxis dataKey="date" fontSize={11} stroke="#64748b" />
                 <YAxis
@@ -499,13 +508,23 @@ function DashboardPage() {
                 />
                 <Line
                   type="monotone"
+                  dataKey="esperado"
+                  name="Ritmo esperado (dias decorridos)"
+                  stroke="#f59e0b"
+                  strokeWidth={2}
+                  strokeDasharray="3 3"
+                  dot={false}
+                />
+                <Line
+                  type="monotone"
                   dataKey="meta"
-                  name="Meta"
+                  name="Meta total"
                   stroke="var(--color-chart-4)"
                   strokeWidth={2}
                   strokeDasharray="5 5"
                   dot={false}
                 />
+
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
