@@ -315,7 +315,7 @@ function DashboardPage() {
 
 
       {/* Cards principais */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <KpiCard
           title="Faturado no mês"
           value={fmtBRL(totalMes)}
@@ -336,12 +336,20 @@ function DashboardPage() {
           subtitle={pctMes >= 100 ? "Meta batida!" : `Faltam ${fmtPct(100 - pctMes)}`}
         />
         <KpiCard
-          title="Falta para meta"
-          value={fmtBRL(falta)}
-          icon={Target}
-          subtitle={falta === 0 ? "Meta atingida" : "Para atingir o mês"}
+          title="% Dias decorridos"
+          value={fmtPct((diaAtual / totalDiasMes) * 100)}
+          icon={Calendar}
+          subtitle={`${diaAtual} de ${totalDiasMes} dias${isCurrentMonth ? ` · ${diasRestantes} restantes` : " · encerrado"}`}
+        />
+        <KpiCard
+          title="Atingido vs Decorrido"
+          value={`${(pctMes - (diaAtual / totalDiasMes) * 100 >= 0 ? "+" : "")}${fmtPct(pctMes - (diaAtual / totalDiasMes) * 100)}`}
+          icon={pctMes >= (diaAtual / totalDiasMes) * 100 ? ArrowUpRight : ArrowDownRight}
+          tone={pctMes >= (diaAtual / totalDiasMes) * 100 ? "success" : pctRitmo >= 90 ? "warning" : "destructive"}
+          subtitle={`Ritmo: ${fmtPct(pctRitmo)} do esperado`}
         />
       </div>
+
 
       {/* % por canal */}
       <div className="grid gap-4 md:grid-cols-2">
@@ -468,7 +476,16 @@ function DashboardPage() {
           </CardHeader>
           <CardContent className="h-72">
             <ResponsiveContainer>
-              <LineChart data={acumulado.map((a) => ({ ...a, meta: metaTotal }))}>
+              <LineChart
+                data={acumulado.map((a) => {
+                  const dayNum = parseISODate(a.rawDate).getDate();
+                  return {
+                    ...a,
+                    meta: metaTotal,
+                    esperado: (metaTotal / totalDiasMes) * dayNum,
+                  };
+                })}
+              >
                 <CartesianGrid strokeDasharray="3 3" className="stroke-slate-100" />
                 <XAxis dataKey="date" fontSize={11} stroke="#64748b" />
                 <YAxis
@@ -491,13 +508,23 @@ function DashboardPage() {
                 />
                 <Line
                   type="monotone"
+                  dataKey="esperado"
+                  name="Ritmo esperado (dias decorridos)"
+                  stroke="#f59e0b"
+                  strokeWidth={2}
+                  strokeDasharray="3 3"
+                  dot={false}
+                />
+                <Line
+                  type="monotone"
                   dataKey="meta"
-                  name="Meta"
+                  name="Meta total"
                   stroke="var(--color-chart-4)"
                   strokeWidth={2}
                   strokeDasharray="5 5"
                   dot={false}
                 />
+
               </LineChart>
             </ResponsiveContainer>
           </CardContent>

@@ -11,8 +11,7 @@ export type AppModule =
   | "marketing"
   | "comercial"
   | "financeiro"
-  | "rh"
-  | "producao"
+  | "engenharia"
   | "configuracoes"
   | "usuarios"
   | "top_produtos";
